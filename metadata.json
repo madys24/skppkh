@@ -1,0 +1,6 @@
+{
+  "name": "Laporan SKP RHK AI",
+  "description": "Aplikasi pembantu ASN dalam menyusun Laporan Rencana Hasil Kerja (RHK) MyASN otomatis dengan AI, dilengkapi multi-upload foto kegiatan serta ekspor PDF dan dokumen Word yang rapi.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
