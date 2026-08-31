@@ -5,7 +5,7 @@ export interface JobTemplate {
   peranInstansi: string;
   unitKerja: string;
   rencanaAksi: string;
-  waktuPelaksanaan: string;
+  waktuPelaksanaan?: string;
   tempatPelaksanaan: string;
   pihakTerlibat: string;
   kopTipe?: string;
@@ -19,7 +19,6 @@ export const JOB_TEMPLATES: JobTemplate[] = [
     peranInstansi: "Memastikan program jaminan perlindungan sosial nasional tersalurkan dengan akurasi tinggi dan bebas pungutan liar.",
     unitKerja: "Layanan Jaminan Sosial Kecamatan Baki",
     rencanaAksi: "Melakukan monitoring dan fasilitasi kelancaran penyaluran bantuan sosial Program Keluarga Harapan (PKH) tahap berjalan.",
-    waktuPelaksanaan: "Sesuai jadwal penyaluran Himbara, Juni 2026",
     tempatPelaksanaan: "E-Warong, Agen Bank Himbara, dan Kantor Pos Wilayah Kecamatan Baki",
     pihakTerlibat: "Keluarga Penerima Manfaat (KPM), Aparat Desa setempat, dan petugas Himbara/Pos penyalur",
     kopTipe: "kemensos"
@@ -31,7 +30,6 @@ export const JOB_TEMPLATES: JobTemplate[] = [
     peranInstansi: "Mendorong perubahan perilaku (behavioral change) KPM PKH ke arah hidup sehat, berpendidikan tinggi, dan mandiri secara finansial.",
     unitKerja: "Kelompok Dampingan Sosial Kecamatan Baki",
     rencanaAksi: "Menyelenggarakan Pertemuan Peningkatan Kemampuan Keluarga (P2K2) Modul Kesehatan & Gizi bagi kelompok dampingan.",
-    waktuPelaksanaan: "Selasa, 09 Juni 2026, Pukul 09:00 - 11:30 WIB",
     tempatPelaksanaan: "Rumah Ketua Kelompok PKH 'Maju Bersama' Dusun II, Kelurahan Kadilangu, Kecamatan Baki",
     pihakTerlibat: "25 orang anggota Kelompok KPM PKH 'Maju Bersama' dan Bidan Desa selaku narasumber pendamping",
     kopTipe: "kemensos"
@@ -43,7 +41,6 @@ export const JOB_TEMPLATES: JobTemplate[] = [
     peranInstansi: "Menjaga keberhasilan program prasyarat PKH dalam meningkatkan derajat kesehatan dan angka partisipasi sekolah anak KPM.",
     unitKerja: "Seksi Jaminan Sosial Keluarga Kecamatan Baki",
     rencanaAksi: "Melakukan verifikasi komitmen kehadiran anak sekolah dan pemantauan kesehatan ibu hamil/balita KPM di fasilitas pendidikan dan kesehatan.",
-    waktuPelaksanaan: "Kamis, 04 Juni 2026, Pukul 08:30 WIB - Selesai",
     tempatPelaksanaan: "Puskesmas Kecamatan Baki, SD Negeri 1 Kinasih, dan SMP Negeri 1 Baki",
     pihakTerlibat: "Petugas Administrasi Puskesmas, Guru BK/Kepala Sekolah, dan Koordinator PKH Kecamatan",
     kopTipe: "kemensos"
@@ -55,7 +52,6 @@ export const JOB_TEMPLATES: JobTemplate[] = [
     peranInstansi: "Mengurangi indeks kemiskinan daerah serta meningkatkan rasio keadilan sasaran penerima bantuan jaminan sosial keluarga.",
     unitKerja: "Mitra Penanggulangan Kemiskinan Kecamatan Baki",
     rencanaAksi: "Melakukan sosialisasi, assessment kemandirian, serta pendampingan wisuda graduasi mandiri bagi KPM yang dinilai mampu secara finansial.",
-    waktuPelaksanaan: "Jumat, 12 Juni 2026, Pukul 09:00 - 11:30 WIB",
     tempatPelaksanaan: "Balai Desa Kadilangu dan Lokasi Usaha Rintisan Mandiri KPM dampingan",
     pihakTerlibat: "3 Keluarga Penerima Manfaat (KPM) lulus graduasi, Kepala Desa Kadilangu, Korkab PKH Kabupaten Sukoharjo",
     kopTipe: "kemensos"
@@ -67,7 +63,6 @@ export const JOB_TEMPLATES: JobTemplate[] = [
     peranInstansi: "Mewujudkan tertib administrasi data kemiskinan nasional (DTKS) secara mutakhir dan valid.",
     unitKerja: "Pusat Kesejahteraan Sosial (Puskesos)",
     rencanaAksi: "Melaksanakan perbaikan dan pemutakhiran data anggota keluarga KPM PKH (seperti status anak sekolah, bayi lahir baru, perpindahan domisili).",
-    waktuPelaksanaan: "Rabu s.d. Kamis, 10 - 11 Juni 2026",
     tempatPelaksanaan: "Sekretariat PPKH Kecamatan Baki dan Kantor Dinas Kependudukan Sipil Sukoharjo",
     pihakTerlibat: "KPM dampingan fungsional, Operator Dapodik sekolah setempat, dan Petugas Administrasi Desa",
     kopTipe: "kemensos"
@@ -79,7 +74,6 @@ export const JOB_TEMPLATES: JobTemplate[] = [
     peranInstansi: "Menjaga transparansi, integritas, dan kenyamanan publik dalam rantai birokrasi penyaluran jaminan sosial.",
     unitKerja: "Unit Pengaduan Masyarakat PPKH Kecamatan Baki",
     rencanaAksi: "Menerima, mencatat, mengklarifikasi, dan memproses penyelesaian pengaduan atau sengketa bansos dalam kelompok dampingan.",
-    waktuPelaksanaan: "Senin, 08 Juni 2026, Pukul 13:00 - 15:30 WIB",
     tempatPelaksanaan: "Sekretariat PKH Kecamatan Baki, Kabupaten Sukoharjo",
     pihakTerlibat: "KPM Pengadu, Tokoh Masyarakat, Koordinator Kecamatan (Korcam) PKH, Dinas Sosial Kab. Sukoharjo",
     kopTipe: "kemensos"
@@ -91,7 +85,6 @@ export const JOB_TEMPLATES: JobTemplate[] = [
     peranInstansi: "Memberikan bahan pertangungjawaban kinerja berkinerja tinggi serta dasar evaluasi jaminan sosial makro tingkat kementerian.",
     unitKerja: "Layanan Teknis PPKH",
     rencanaAksi: "Menyusun, merangkum, dan menyampaikan berkas pertanggungjawaban Laporan Bulanan kinerja Pendamping Sosial PKH.",
-    waktuPelaksanaan: "Akhir Periode Kerja Bulan Juni 2026",
     tempatPelaksanaan: "Kantor Sekretariat PKH Kecamatan Baki dan Kantor Dinas Sosial Sukoharjo",
     pihakTerlibat: "Koordinator Kabupaten (Korkab) PKH, Pejabat fungsional Dinas Sosial, dan tim administrasi",
     kopTipe: "kemensos"
@@ -103,7 +96,6 @@ export const JOB_TEMPLATES: JobTemplate[] = [
     peranInstansi: "Meningkatkan sinergitas lintas instansi guna akselerasi kesejahteraan dan penanggulangan isu sosial krusial secara komprehensif.",
     unitKerja: "Sekretariat PKH Kecamatan Baki",
     rencanaAksi: "Mengikuti rapat koordinasi tingkat kecamatan/desa, koordinasi dengan perangkat, dan melaksanakan disposisi tugas insidental pimpinan.",
-    waktuPelaksanaan: "Jumat, 12 Juni 2026, Pukul 13:00 - 16:30 WIB",
     tempatPelaksanaan: "Ruang Rapat Kecamatan Baki",
     pihakTerlibat: "6 personil SDM PKH, Koordinator Tim Kecamatan (KatimCam) PKH Bapak Arief Darmawan, S.H.I., Camat, Lurah, Desa",
     kopTipe: "kemensos"
@@ -115,7 +107,6 @@ export const JOB_TEMPLATES: JobTemplate[] = [
     peranInstansi: "Membangun kesadaran publik yang positif dan mengedukasi masyarakat terkait kebijakan jaminan sosial secara transparan.",
     unitKerja: "Humas PPKH Kecamatan Baki",
     rencanaAksi: "Membuat konten edukasi jaminan sosial, mendesain narasi cerita sukses KPM, serta membagikan informasi positif di platform media sosial resmi pendamping PKH.",
-    waktuPelaksanaan: "Selasa, 10 Juni 2026, Pukul 10:00 - 13:00 WIB",
     tempatPelaksanaan: "Sekretariat PPKH Kecamatan Baki dan Media Sosial Resmi Instansi",
     pihakTerlibat: "KPM Graduasi Mandiri Sejahtera, Tim Editor Humas PPKH, serta Publik / Warganet media sosial",
     kopTipe: "kemensos"
@@ -127,7 +118,6 @@ export const JOB_TEMPLATES: JobTemplate[] = [
     peranInstansi: "Mendukung percepatan digitalisasi pelayanan dan integrasi sistem administrasi perkantoran yang andal.",
     unitKerja: "Subbagian Data dan Informasi",
     rencanaAksi: "Melakukan pemeliharaan rutin infrastruktur server lokal, pemulihan gangguan jaringan, dan pendampingan bantuan teknis.",
-    waktuPelaksanaan: "Senin s.d. Jumat, 08 - 12 Juni 2026, Pukul 08:00 - 16:00 WIB",
     tempatPelaksanaan: "Gedung Utama Lantai 2, Ruang Server Pusat, dan Area Pelayanan Publik",
     pihakTerlibat: "Staf Subbagian Data & Informasi, serta 12 personel layanan fungsional penerima manfaat bantuan helpdesk"
   },
@@ -138,7 +128,6 @@ export const JOB_TEMPLATES: JobTemplate[] = [
     peranInstansi: "Meningkatkan mutu kelulusan siswa dan kualitas indeks literasi-numerasi satuan pendidikan.",
     unitKerja: "SMA Negeri 1 Jaya",
     rencanaAksi: "Penyusunan Rencana Pelaksanaan Pembelajaran (RPP), penyelenggaraan asesmen harian, dan pembimbingan pramuka inklusif.",
-    waktuPelaksanaan: "Setiap hari kerja, 02 Juni s.d. 12 Juni 2026, Jam Pelajaran Sekolah (07:00 - 14:00 WIB)",
     tempatPelaksanaan: "Ruang Kelas XI-A dan Ruang Kelas XI-B SMA Negeri 1 Jaya",
     pihakTerlibat: "72 orang siswa Kelas XI, rekan sejawat sesama Guru fungsional, dan diawasi oleh Wakil Kepala Sekolah"
   },
@@ -149,7 +138,6 @@ export const JOB_TEMPLATES: JobTemplate[] = [
     peranInstansi: "Mendukung mutu keselamatan pasien berstandar akreditasi rumah sakit daerah.",
     unitKerja: "Instalasi Rawat Inap Melati",
     rencanaAksi: "Melakukan anamnesa, asuhan keperawatan gawat darurat, pendataan klinis akurat, dan edukasi pasca-operasi kepada keluarga pasien.",
-    waktuPelaksanaan: "Pemberlakuan Shift Pagi/Sore, Periode 01 s.d. 10 Juni 2026",
     tempatPelaksanaan: "Ruang Instalasi Gawat Darurat (IGD) dan Kamar Rawat Inap Melati",
     pihakTerlibat: "8 pasien gawat darurat, Dokter Spesialis Penanggung Jawab Pelayanan (DPJP), serta paramedis tim Perawat Jaga"
   },
@@ -160,7 +148,6 @@ export const JOB_TEMPLATES: JobTemplate[] = [
     peranInstansi: "Mewujudkan efisiensi rantai birokrasi pengambilan keputusan internal pimpinan.",
     unitKerja: "Bagian Organisasi dan Tata Laksana",
     rencanaAksi: "Drafting Nota Dinas usulan tata organisasi dinas, rekap anggaran triwulanan, dan fasilitasi forum sosialisasi SOP.",
-    waktuPelaksanaan: "Rabu s.d. Kamis, 03 - 04 Juni 2026, Pukul 09:00 WIB - Selesai",
     tempatPelaksanaan: "Ruang Rapat Utama Bagian Organisasi dan Tata Laksana Gedung B",
     pihakTerlibat: "Kepala Bagian Organisasi, Perwakilan Biro Hukum Setda, serta seluruh kepala bidang operasional"
   }

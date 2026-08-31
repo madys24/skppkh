@@ -111,21 +111,24 @@ export default function App() {
 
   // Prepopulate from templates
   const handleApplyTemplate = (temp: JobTemplate) => {
-    const initialWaktu = temp.waktuPelaksanaan || "";
-    setInputs((prev) => ({
-      ...prev,
-      jabatan: temp.title,
-      rhkUtama: temp.rhkUtama,
-      ringkasanKegiatan: temp.ringkasanKegiatan,
-      peranInstansi: temp.peranInstansi,
-      unitKerja: temp.unitKerja,
-      rencanaAksi: temp.rencanaAksi,
-      waktuPelaksanaan: initialWaktu,
-      tanggalPembuatan: extractFormalDateForSignature(initialWaktu),
-      tempatPelaksanaan: temp.tempatPelaksanaan,
-      pihakTerlibat: temp.pihakTerlibat,
-      kopTipe: temp.kopTipe || prev.kopTipe || "kemensos",
-    }));
+    setInputs((prev) => {
+      // Retain existing user date or format from current date if empty
+      const effectiveWaktu = prev.waktuPelaksanaan || (inputsStartDate ? formatIndonesianDateRange(inputsStartDate, inputsEndDate) : "");
+      return {
+        ...prev,
+        jabatan: temp.title,
+        rhkUtama: temp.rhkUtama,
+        ringkasanKegiatan: temp.ringkasanKegiatan,
+        peranInstansi: temp.peranInstansi,
+        unitKerja: temp.unitKerja,
+        rencanaAksi: temp.rencanaAksi,
+        waktuPelaksanaan: effectiveWaktu,
+        tanggalPembuatan: extractFormalDateForSignature(effectiveWaktu),
+        tempatPelaksanaan: temp.tempatPelaksanaan,
+        pihakTerlibat: temp.pihakTerlibat,
+        kopTipe: temp.kopTipe || prev.kopTipe || "kemensos",
+      };
+    });
 
     // Detect and sync PKH active RHK ID for the dynamic selectors
     if (temp.title.includes("RHK 1")) setActivePkhRhkId(1);
@@ -638,13 +641,13 @@ Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai cap
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-slate-600 mb-1.5 uppercase tracking-wide">
-                        Tanggal Pembuatan
+                        Tanggal Tanda Tangan / Pengesahan
                       </label>
                       <div className="relative">
                         <Calendar className="absolute right-3.5 top-2.5 w-4 h-4 text-slate-300" />
                         <input
                           type="text"
-                          placeholder="Contoh: 15 Juni 2026"
+                          placeholder="Otomatis mengikuti tanggal pelaksanaan"
                           value={inputs.tanggalPembuatan}
                           onChange={(e) => setInputs({ ...inputs, tanggalPembuatan: e.target.value })}
                           className="w-full pl-3.5 pr-10 py-2 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-xs shadow-sm bg-slate-50/50"
@@ -1077,7 +1080,7 @@ Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai cap
                         <input
                           type="text"
                           required
-                          placeholder="Contoh: Senin s.d. Jumat, 08 - 12 Juni 2026"
+                          placeholder="Contoh: Senin, 31 Agustus 2026 atau Senin s.d. Jumat, 01 - 05 September 2026"
                           value={inputs.waktuPelaksanaan}
                           onChange={(e) => {
                             const val = e.target.value;
