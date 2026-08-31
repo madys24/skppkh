@@ -26,14 +26,16 @@ import { PKH_RHK_OPTIONS, PkhRhkOption } from "./data/pkhOptions";
 import { A4Preview } from "./components/A4Preview";
 import { exportToWord } from "./utils/wordGenerator";
 import { ProfileSignatureCard } from "./components/ProfileSignatureCard";
-import { formatIndonesianDateRange, getReportFileName } from "./utils/dateFormatter";
+import { formatIndonesianDateRange, getReportFileName, extractFormalDateForSignature } from "./utils/dateFormatter";
 import { printReportDocument } from "./utils/printHelper";
 import { polishTextOffline } from "./utils/textPolisher";
+import { downloadDirectPdf } from "./utils/pdfGenerator";
 
 export default function App() {
   // Navigation / App State
   const [step, setStep] = useState<"setup" | "workspace">("setup");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isPdfDownloading, setIsPdfDownloading] = useState(false);
   const [genStep, setGenStep] = useState(1);
   const [errorStatus, setErrorStatus] = useState<string | null>(null);
 
@@ -53,7 +55,7 @@ export default function App() {
     waktuPelaksanaan: "",
     tempatPelaksanaan: "",
     pihakTerlibat: "",
-    kopTipe: "none",
+    kopTipe: "kemensos",
     kopKementerian: "",
     kopEselon1: "",
     kopEselon2: "",
@@ -90,22 +92,26 @@ export default function App() {
   const [polishInstructions, setPolishInstructions] = useState<Record<string, string>>({});
   const [polishingStatus, setPolishingStatus] = useState<Record<string, boolean>>({});
 
-  // Populate helper: set date automatically on mount
+  // Populate helper: set date automatically on mount to today's date
   useEffect(() => {
     const today = new Date();
-    const months = [
-      "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
-      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-    ];
-    const formattedDate = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    const todayIso = `${yyyy}-${mm}-${dd}`;
+    
+    setInputsStartDate(todayIso);
+    const formatted = formatIndonesianDateRange(todayIso);
     setInputs((prev) => ({
       ...prev,
-      tanggalPembuatan: formattedDate,
+      waktuPelaksanaan: prev.waktuPelaksanaan || formatted,
+      tanggalPembuatan: extractFormalDateForSignature(prev.waktuPelaksanaan || formatted),
     }));
   }, []);
 
   // Prepopulate from templates
   const handleApplyTemplate = (temp: JobTemplate) => {
+    const initialWaktu = temp.waktuPelaksanaan || "";
     setInputs((prev) => ({
       ...prev,
       jabatan: temp.title,
@@ -114,10 +120,11 @@ export default function App() {
       peranInstansi: temp.peranInstansi,
       unitKerja: temp.unitKerja,
       rencanaAksi: temp.rencanaAksi,
-      waktuPelaksanaan: temp.waktuPelaksanaan,
+      waktuPelaksanaan: initialWaktu,
+      tanggalPembuatan: extractFormalDateForSignature(initialWaktu),
       tempatPelaksanaan: temp.tempatPelaksanaan,
       pihakTerlibat: temp.pihakTerlibat,
-      kopTipe: temp.kopTipe || prev.kopTipe || "none",
+      kopTipe: temp.kopTipe || prev.kopTipe || "kemensos",
     }));
 
     // Detect and sync PKH active RHK ID for the dynamic selectors
@@ -428,6 +435,21 @@ Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai cap
 
       return updated;
     });
+  };
+
+  // Direct PDF Download Handler
+  const handleDirectPdfDownload = async () => {
+    if (!report) return;
+    setIsPdfDownloading(true);
+    try {
+      await downloadDirectPdf(report, photos);
+    } catch (e) {
+      console.error("Direct PDF generation error:", e);
+      // Fallback to print preview
+      triggerNativePrint();
+    } finally {
+      setIsPdfDownloading(false);
+    }
   };
 
   // Trigger A4 Native Print window
@@ -1014,7 +1036,11 @@ Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai cap
                                 const newStart = e.target.value;
                                 setInputsStartDate(newStart);
                                 const formatted = formatIndonesianDateRange(newStart, inputsEndDate);
-                                setInputs(prev => ({ ...prev, waktuPelaksanaan: formatted }));
+                                setInputs(prev => ({ 
+                                  ...prev, 
+                                  waktuPelaksanaan: formatted,
+                                  tanggalPembuatan: extractFormalDateForSignature(formatted)
+                                }));
                               }}
                               className="w-full px-3 py-1.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-xs shadow-sm bg-white font-sans text-slate-700"
                             />
@@ -1028,7 +1054,11 @@ Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai cap
                                 const newEnd = e.target.value;
                                 setInputsEndDate(newEnd);
                                 const formatted = formatIndonesianDateRange(inputsStartDate, newEnd);
-                                setInputs(prev => ({ ...prev, waktuPelaksanaan: formatted }));
+                                setInputs(prev => ({ 
+                                  ...prev, 
+                                  waktuPelaksanaan: formatted,
+                                  tanggalPembuatan: extractFormalDateForSignature(formatted)
+                                }));
                               }}
                               className="w-full px-3 py-1.5 rounded-xl border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-xs shadow-sm bg-white font-sans text-slate-700"
                             />
@@ -1049,7 +1079,14 @@ Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai cap
                           required
                           placeholder="Contoh: Senin s.d. Jumat, 08 - 12 Juni 2026"
                           value={inputs.waktuPelaksanaan}
-                          onChange={(e) => setInputs({ ...inputs, waktuPelaksanaan: e.target.value })}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setInputs({ 
+                              ...inputs, 
+                              waktuPelaksanaan: val,
+                              tanggalPembuatan: extractFormalDateForSignature(val)
+                            });
+                          }}
                           className="w-full px-3.5 py-2 rounded-xl border border-emerald-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-xs font-semibold text-emerald-950 bg-white shadow-xs"
                         />
                       </div>
@@ -1233,22 +1270,37 @@ Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai cap
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={() => exportToWord(report, photos)}
-                    title="Unduh dokumen dalam format Microsoft Word (.docx) dengan logo Kemensos & Tata Naskah Dinas presisi"
-                    className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow cursor-pointer active:scale-95"
+                    title="Unduh dokumen dalam format Microsoft Word (.docx)"
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow cursor-pointer active:scale-95"
                   >
                     <Download className="w-4 h-4 shrink-0 text-blue-600" />
                     <span>Unduh Word (.docx)</span>
                   </button>
+
+                  <button
+                    onClick={handleDirectPdfDownload}
+                    disabled={isPdfDownloading}
+                    title="Unduh berkas PDF (.pdf) langsung ke perangkat Anda tanpa membuka dialog printer"
+                    className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 disabled:bg-emerald-400 text-white rounded-xl text-xs font-bold shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
+                  >
+                    {isPdfDownloading ? (
+                      <RefreshCw className="w-4 h-4 shrink-0 animate-spin" />
+                    ) : (
+                      <FileText className="w-4 h-4 shrink-0 text-emerald-100" />
+                    )}
+                    <span>{isPdfDownloading ? "Menyiapkan PDF..." : "Unduh PDF (.pdf)"}</span>
+                  </button>
+
                   <button
                     onClick={triggerNativePrint}
-                    title="Simpan dokumen sebagai PDF (.pdf) dengan penamaan berkas otomatis standar kepegawaian"
-                    className="flex items-center gap-2 px-4.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
+                    title="Cetak dokumen ke printer fisik atau buka pratinjau cetak browser"
+                    className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow cursor-pointer active:scale-95"
                   >
-                    <FileText className="w-4 h-4 shrink-0 text-emerald-100" />
-                    <span>Simpan PDF (.pdf)</span>
+                    <Printer className="w-4 h-4 shrink-0 text-slate-600" />
+                    <span>Cetak / Print</span>
                   </button>
                 </div>
               </div>
@@ -1261,9 +1313,43 @@ Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai cap
                   
                   {/* metadata info edit accordion */}
                   <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 space-y-4">
-                    <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-100 pb-2.5">
-                      <Layers className="w-4 h-4 text-emerald-600" /> Informasi Pegawai & Pembuatan
-                    </h3>
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                      <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <Layers className="w-4 h-4 text-emerald-600" /> Informasi Pegawai & Pembuatan
+                      </h3>
+                    </div>
+
+                    {/* Kop Surat Switcher in Workspace */}
+                    <div className="bg-emerald-50/40 p-3 rounded-xl border border-emerald-100/70 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-[10px] font-bold text-emerald-900 uppercase tracking-wide flex items-center gap-1.5">
+                          <FileSignature className="w-3.5 h-3.5 text-emerald-600" /> Kop Surat Laporan
+                        </label>
+                        <span className="text-[9px] font-bold text-emerald-700 bg-white px-2 py-0.5 rounded border border-emerald-200">
+                          {report.kopTipe === "kemensos" ? "Kemensos RI" : report.kopTipe === "kustom" ? "Kustom" : "Tanpa Kop"}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1.5">
+                        {[
+                          { value: "kemensos", label: "Kemensos RI" },
+                          { value: "kustom", label: "Kustom" },
+                          { value: "none", label: "Tanpa Kop" }
+                        ].map((opt) => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => setReport({ ...report, kopTipe: opt.value })}
+                            className={`py-1 text-[10px] font-bold rounded-lg border transition-all ${
+                              (report.kopTipe || "kemensos") === opt.value
+                                ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
+                                : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
 
                     <div className="grid grid-cols-2 gap-3.5">
                       <div>
@@ -1318,12 +1404,16 @@ Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai cap
                         />
                       </div>
                       <div>
-                        <label className="block text-[10px] font-semibold text-slate-500 mb-1">Tanggal Pembuatan</label>
+                        <label className="block text-[10px] font-semibold text-slate-500 mb-1 flex items-center justify-between">
+                          <span>Tanggal Naskah</span>
+                          <span className="text-[8.5px] text-emerald-700 font-medium bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200/50">Auto Tanggal Kegiatan</span>
+                        </label>
                         <input
                           type="text"
-                          value={report.tanggalPembuatan}
-                          onChange={(e) => setReport({ ...report, tanggalPembuatan: e.target.value })}
-                          className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-xs shadow-sm"
+                          disabled
+                          value={extractFormalDateForSignature(report.waktuPelaksanaan, report.tanggalPembuatan)}
+                          title="Tanggal pembuatan naskah disamakan otomatis dengan tanggal kegiatan"
+                          className="w-full px-2.5 py-1.5 rounded-lg border border-emerald-100 bg-emerald-50/50 text-emerald-950 text-xs font-semibold shadow-2xs cursor-not-allowed"
                         />
                       </div>
                     </div>
@@ -1344,7 +1434,14 @@ Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai cap
                           <input
                             type="text"
                             value={report.waktuPelaksanaan}
-                            onChange={(e) => setReport({ ...report, waktuPelaksanaan: e.target.value })}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setReport({ 
+                                ...report, 
+                                waktuPelaksanaan: val,
+                                tanggalPembuatan: extractFormalDateForSignature(val)
+                              });
+                            }}
                             className="w-full px-2 py-1 rounded-lg border border-slate-200 text-[10px] shadow-sm text-slate-800 bg-white font-semibold"
                           />
                           <div className="mt-1.5 grid grid-cols-2 gap-1.5 bg-slate-50 p-1.5 rounded-lg border border-slate-100">
@@ -1357,7 +1454,11 @@ Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai cap
                                   const nStart = e.target.value;
                                   setReportStartDate(nStart);
                                   const formatted = formatIndonesianDateRange(nStart, reportEndDate);
-                                  setReport({ ...report, waktuPelaksanaan: formatted });
+                                  setReport({ 
+                                    ...report, 
+                                    waktuPelaksanaan: formatted,
+                                    tanggalPembuatan: extractFormalDateForSignature(formatted)
+                                  });
                                 }}
                                 className="w-full p-0.5 border border-slate-200 rounded text-[9px] text-slate-600 bg-white font-sans"
                               />
@@ -1371,7 +1472,11 @@ Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai cap
                                   const nEnd = e.target.value;
                                   setReportEndDate(nEnd);
                                   const formatted = formatIndonesianDateRange(reportStartDate, nEnd);
-                                  setReport({ ...report, waktuPelaksanaan: formatted });
+                                  setReport({ 
+                                    ...report, 
+                                    waktuPelaksanaan: formatted,
+                                    tanggalPembuatan: extractFormalDateForSignature(formatted)
+                                  });
                                 }}
                                 className="w-full p-0.5 border border-slate-200 rounded text-[9px] text-slate-600 bg-white font-sans"
                               />

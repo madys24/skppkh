@@ -1,5 +1,5 @@
 import { ReportData, PhotoAttachment } from "../types";
-import { getReportFileName, formatJudulLaporan } from "./dateFormatter";
+import { getReportFileName, formatJudulLaporan, extractFormalDateForSignature } from "./dateFormatter";
 
 /**
  * Robust print helper that prints the A4 Report document cleanly into PDF or Paper
@@ -117,8 +117,8 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
       font-weight: bold;
       color: #000;
       text-transform: uppercase;
-      margin-top: 20px;
-      margin-bottom: 8px;
+      margin-top: 14px;
+      margin-bottom: 6px;
       page-break-after: avoid;
       break-after: avoid;
     }
@@ -128,25 +128,21 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
       text-justify: inter-word;
     }
     .sub-item {
-      margin-bottom: 12px;
-      page-break-inside: avoid;
-      break-inside: avoid;
+      margin-bottom: 10px;
     }
     .sub-item-title {
       font-weight: bold;
-      margin-bottom: 3px;
+      margin-bottom: 2px;
+      page-break-after: avoid;
+      break-after: avoid;
     }
     .text-paragraph {
       white-space: pre-line;
       margin: 0;
       color: #1f2937;
     }
-    .block-break {
-      page-break-inside: avoid;
-      break-inside: avoid;
-    }
     .signature-container {
-      margin-top: 36px;
+      margin-top: 28px;
       page-break-inside: avoid;
       break-inside: avoid;
       width: 100%;
@@ -179,7 +175,7 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
     </div>
 
     <!-- A. PENDAHULUAN -->
-    <div class="block-break">
+    <div style="margin-top: 10px;">
       <div class="section-title">A. PENDAHULUAN</div>
       <div class="section-content">
         <div class="sub-item">
@@ -202,7 +198,7 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
     </div>
 
     <!-- B. KEGIATAN YANG DILAKSANAKAN -->
-    <div class="block-break" style="margin-top: 16px;">
+    <div style="margin-top: 12px;">
       <div class="section-title">B. KEGIATAN YANG DILAKSANAKAN</div>
       <div class="section-content">
         <p class="text-paragraph">${data.kegiatanLaksana || "-"}</p>
@@ -210,7 +206,7 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
     </div>
 
     <!-- C. HASIL YANG DICAPAI -->
-    <div class="block-break" style="margin-top: 16px;">
+    <div style="margin-top: 12px;">
       <div class="section-title">C. HASIL YANG DICAPAI</div>
       <div class="section-content">
         <p class="text-paragraph">${data.hasilDicapai || "-"}</p>
@@ -218,7 +214,7 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
     </div>
 
     <!-- D. SIMPULAN DAN SARAN -->
-    <div class="block-break" style="margin-top: 16px;">
+    <div style="margin-top: 12px;">
       <div class="section-title">D. SIMPULAN DAN SARAN</div>
       <div class="section-content">
         <div class="sub-item">
@@ -233,7 +229,7 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
     </div>
 
     <!-- E. PENUTUP -->
-    <div class="block-break" style="margin-top: 16px;">
+    <div style="margin-top: 12px;">
       <div class="section-title">E. PENUTUP</div>
       <div class="section-content">
         <p class="text-paragraph">${data.penutup || "-"}</p>
@@ -246,7 +242,7 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
         <tr>
           <td style="width: 52%;"></td>
           <td style="width: 48%; text-align: left;">
-            <div>${data.tempatPembuatan || "Jakarta"}, ${data.tanggalPembuatan || "15 Juni 2026"}</div>
+            <div>${data.tempatPembuatan || "Jakarta"}, ${extractFormalDateForSignature(data.waktuPelaksanaan, data.tanggalPembuatan)}</div>
             <div style="font-weight: bold; text-transform: uppercase; font-size: 9.5pt; margin-top: 2px; letter-spacing: 0.5px;">${data.jabatan || "Pelapor"}</div>
             <div style="height: 75px; display: flex; align-items: center; justify-content: flex-start; margin: 4px 0;">
               ${signatureImgHtml}

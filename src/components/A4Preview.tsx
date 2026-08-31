@@ -1,6 +1,6 @@
 import React from "react";
 import { ReportData, PhotoAttachment } from "../types";
-import { formatJudulLaporan, getReportFileName } from "../utils/dateFormatter";
+import { formatJudulLaporan, getReportFileName, extractFormalDateForSignature } from "../utils/dateFormatter";
 
 interface A4PreviewProps {
   data: ReportData;
@@ -13,10 +13,10 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
       {/* Help Alert */}
       <div className="mb-4 bg-emerald-50 text-emerald-900 border-l-4 border-emerald-500 p-3.5 text-xs rounded-xl shadow-xs no-print">
         <p className="font-bold mb-1 flex items-center gap-1.5 text-emerald-800">
-          <span>💡</span> Petunjuk Simpan Dokumen PDF:
+          <span>💡</span> Format Ekspor Dokumen Laporan:
         </p>
         <p className="text-emerald-800/90 leading-relaxed">
-          Klik tombol <strong>Simpan PDF (.pdf)</strong> di atas. Dialog browser akan otomatis membuka dengan nama berkas standar naskah dinas: <code className="bg-emerald-100 text-emerald-950 font-bold px-1.5 py-0.5 rounded text-[11px] font-mono">{getReportFileName(data)}.pdf</code>. Pastikan opsi <em>Tujuan / Destination</em> diatur ke <strong>Save as PDF (Simpan sebagai PDF)</strong>.
+          Nama berkas otomatis: <code className="bg-emerald-100 text-emerald-950 font-bold px-1.5 py-0.5 rounded text-[11px] font-mono">{getReportFileName(data)}</code>. Anda dapat mengklik <strong>Unduh Word (.docx)</strong> untuk berkas Microsoft Word, atau <strong>Unduh PDF (.pdf)</strong> untuk mengunduh langsung berkas PDF tanpa membuka dialog cetak, atau <strong>Cetak / Print</strong> untuk pratinjau cetak printer.
         </p>
       </div>
 
@@ -123,7 +123,7 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
         </div>
 
         {/* B. KEGIATAN YANG DILAKSANAKAN */}
-        <div className="mb-6 block-break">
+        <div className="mb-6">
           <h3 className="text-[12pt] font-bold text-black uppercase mb-2">B. KEGIATAN YANG DILAKSANAKAN</h3>
           <div className="pl-4 text-justify">
             <p className="whitespace-pre-line text-gray-800 leading-relaxed font-normal">{data.kegiatanLaksana || "-"}</p>
@@ -131,7 +131,7 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
         </div>
 
         {/* C. HASIL YANG DICAPAI */}
-        <div className="mb-6 block-break">
+        <div className="mb-6">
           <h3 className="text-[12pt] font-bold text-black uppercase mb-2">C. HASIL YANG DICAPAI</h3>
           <div className="pl-4 text-justify">
             <p className="whitespace-pre-line text-gray-800 leading-relaxed font-normal">{data.hasilDicapai || "-"}</p>
@@ -139,7 +139,7 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
         </div>
 
         {/* D. SIMPULAN DAN SARAN */}
-        <div className="mb-6 block-break">
+        <div className="mb-6">
           <h3 className="text-[12pt] font-bold text-black uppercase mb-3">D. SIMPULAN DAN SARAN</h3>
           
           <div className="space-y-4 text-justify pl-4">
@@ -156,7 +156,7 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
         </div>
 
         {/* E. PENUTUP */}
-        <div className="mb-8 block-break">
+        <div className="mb-8">
           <h3 className="text-[12pt] font-bold text-black uppercase mb-2">E. PENUTUP</h3>
           <div className="pl-4 text-justify">
             <p className="whitespace-pre-line text-gray-800 leading-relaxed font-normal">{data.penutup || "-"}</p>
@@ -164,14 +164,14 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
         </div>
 
         {/* Signature Area Grid */}
-        <div className="mt-12 block-break">
+        <div className="mt-8" style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
           <table className="w-full text-[11pt]">
             <tbody>
               <tr>
                 <td className="w-[55%]"></td>
                 <td className="w-[45%] text-left">
                   <p className="mb-1">
-                    {data.tempatPembuatan || "Jakarta"}, {data.tanggalPembuatan || "15 Juni 2026"}
+                    {data.tempatPembuatan || "Jakarta"}, {extractFormalDateForSignature(data.waktuPelaksanaan, data.tanggalPembuatan)}
                   </p>
                   <p className="font-bold mb-1 uppercase tracking-wider text-xs">
                     {data.jabatan || "Pelapor"}
@@ -209,7 +209,7 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
 
         {/* Image Attachment (Halaman Berikutnya) */}
         {photos.length > 0 && (
-          <div className="page-break" style={{ pageBreakBefore: "always" }}>
+          <div className="page-break" style={{ pageBreakBefore: "always", breakBefore: "page" }}>
             {/* Divider element on screen, is page break during actual print */}
             <div className="h-[2px] w-full border-b-2 border-dashed border-slate-300 my-8 no-print"></div>
             
@@ -222,7 +222,7 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
 
             <div className="space-y-8">
               {photos.map((photo, i) => (
-                <div key={photo.id || i} className="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg max-w-full block-break bg-slate-50">
+                <div key={photo.id || i} className="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-lg max-w-full bg-slate-50" style={{ pageBreakInside: "avoid", breakInside: "avoid" }}>
                   <img 
                     src={photo.base64Data} 
                     alt={photo.caption || photo.fileName} 
@@ -279,14 +279,14 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
             width: 100% !important;
             max-width: 100% !important;
             margin: 0 !important;
-            padding: 2.5cm 2.5cm 2.5cm 2.5cm !important;
+            padding: 2cm 2cm 2cm 2cm !important;
             box-shadow: none !important;
             border: none !important;
             background-color: #ffffff !important;
             color: #000000 !important;
             font-family: 'Times New Roman', Times, serif !important;
             font-size: 11pt !important;
-            line-height: 1.6 !important;
+            line-height: 1.5 !important;
           }
 
           @page {
@@ -298,13 +298,9 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
             page-break-before: always !important;
             break-before: page !important;
           }
-          .block-break {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
-          }
-          p, h1, h2, h3, h4, table, tr, img {
-            page-break-inside: avoid !important;
-            break-inside: avoid !important;
+          h1, h2, h3, h4 {
+            page-break-after: avoid !important;
+            break-after: avoid !important;
           }
         }
       `}</style>

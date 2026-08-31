@@ -50,6 +50,47 @@ export function formatIndonesianDateRange(startDateStr: string, endDateStr?: str
 }
 
 /**
+ * Resolves the formal date for the signature line from the activity date (waktuPelaksanaan).
+ * E.g., if waktuPelaksanaan is "Senin, 15 Juni 2026", it returns "15 Juni 2026".
+ * If waktuPelaksanaan is "Senin s.d. Jumat, 08 - 12 Juni 2026", it returns "12 Juni 2026".
+ */
+export function extractFormalDateForSignature(waktuPelaksanaan?: string, fallbackDate?: string): string {
+  const text = (waktuPelaksanaan || fallbackDate || "").trim();
+  
+  if (!text) {
+    const today = new Date();
+    const months = [
+      "Januari", "Februari", "Maret", "April", "Mei", "Juni", 
+      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+    return `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`;
+  }
+
+  // If text is in range format like "Senin s.d. Jumat, 08 - 12 Juni 2026" or "15 - 17 Juni 2026"
+  // Extract the end date: e.g. "12 Juni 2026" or "17 Juni 2026"
+  const rangeMatch = text.match(/(?:-|s\.d\.|sampai)\s*(?:[a-zA-Z]+,)?\s*(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})/i);
+  if (rangeMatch) {
+    const d = parseInt(rangeMatch[1], 10);
+    const m = rangeMatch[2];
+    const y = rangeMatch[3];
+    return `${d} ${m} ${y}`;
+  }
+
+  // Single date format: e.g. "Senin, 15 Juni 2026" or "15 Juni 2026"
+  const singleDateMatch = text.match(/(\d{1,2})\s+([a-zA-Z]+)\s+(\d{4})/i);
+  if (singleDateMatch) {
+    const d = parseInt(singleDateMatch[1], 10);
+    const m = singleDateMatch[2];
+    const y = singleDateMatch[3];
+    return `${d} ${m} ${y}`;
+  }
+
+  // If already clean text without day name
+  const stripped = text.replace(/^[a-zA-Z\s]+,\s*/, "").trim();
+  return stripped || text;
+}
+
+/**
  * Extracts ddmmyyyy format string from Indonesian dates or standard ISO dates
  */
 export function formatFilenameDate(tanggalPembuatan?: string, waktuPelaksanaan?: string): string {
@@ -105,7 +146,8 @@ export function formatFilenameDate(tanggalPembuatan?: string, waktuPelaksanaan?:
     return null;
   };
 
-  const parsed = tryParse(tanggalPembuatan) || tryParse(waktuPelaksanaan);
+  // Prioritize activity date (waktuPelaksanaan) then fallback to tanggalPembuatan
+  const parsed = tryParse(waktuPelaksanaan) || tryParse(tanggalPembuatan);
   if (parsed) return parsed;
 
   const d = String(now.getDate()).padStart(2, "0");

@@ -13,7 +13,7 @@ import {
   ImageRun 
 } from "docx";
 import { ReportData, PhotoAttachment } from "../types";
-import { getReportFileName, formatJudulLaporan } from "./dateFormatter";
+import { getReportFileName, formatJudulLaporan, extractFormalDateForSignature } from "./dateFormatter";
 
 const KEMENSOS_SVG_RAW = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="455pt" height="510.2pt" viewBox="0 0 455 510.2" version="1.1">
@@ -43,46 +43,80 @@ async function base64ToArrayBuffer(base64: string): Promise<ArrayBuffer> {
   return bytes.buffer;
 }
 
-// Convert SVG text to high-res PNG ArrayBuffer for seamless MS Word rendering
+// Convert SVG text to high-res PNG ArrayBuffer with multiple bulletproof fallbacks
 async function renderSvgToPngArrayBuffer(svgString: string): Promise<ArrayBuffer | null> {
-  return new Promise((resolve) => {
-    try {
+  // Normalize SVG string to ensure standard pixel dimensions and clean viewBox
+  const cleanSvg = svgString
+    .replace(/width="[^"]*"/, 'width="455"')
+    .replace(/height="[^"]*"/, 'height="510"')
+    .trim();
+
+  const loadAndDrawImage = (src: string): Promise<ArrayBuffer | null> => {
+    return new Promise((resolve) => {
       const img = new Image();
-      const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
-      const blobURL = window.URL.createObjectURL(svgBlob);
+      img.crossOrigin = "anonymous";
+      
+      const timeout = setTimeout(() => {
+        resolve(null);
+      }, 2500);
 
       img.onload = () => {
+        clearTimeout(timeout);
         try {
           const canvas = document.createElement("canvas");
-          canvas.width = 400;
-          canvas.height = 400;
+          canvas.width = 455;
+          canvas.height = 510;
           const ctx = canvas.getContext("2d");
           if (ctx) {
-            ctx.clearRect(0, 0, 400, 400);
-            ctx.drawImage(img, 0, 0, 400, 400);
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+            ctx.clearRect(0, 0, 455, 510);
+            ctx.drawImage(img, 0, 0, 455, 510);
             const pngDataUrl = canvas.toDataURL("image/png");
-            window.URL.revokeObjectURL(blobURL);
             base64ToArrayBuffer(pngDataUrl).then(resolve).catch(() => resolve(null));
           } else {
-            window.URL.revokeObjectURL(blobURL);
             resolve(null);
           }
-        } catch {
-          window.URL.revokeObjectURL(blobURL);
+        } catch (e) {
+          console.warn("Canvas rasterization error:", e);
           resolve(null);
         }
       };
 
       img.onerror = () => {
-        window.URL.revokeObjectURL(blobURL);
+        clearTimeout(timeout);
         resolve(null);
       };
 
-      img.src = blobURL;
-    } catch {
-      resolve(null);
-    }
-  });
+      img.src = src;
+    });
+  };
+
+  // Strategy 1: Clean Data URI (instant, no Blob lifecycle issues)
+  const dataUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(cleanSvg)}`;
+  let result = await loadAndDrawImage(dataUri);
+  if (result && result.byteLength > 100) return result;
+
+  // Strategy 2: Blob URL
+  try {
+    const svgBlob = new Blob([cleanSvg], { type: "image/svg+xml;charset=utf-8" });
+    const blobURL = window.URL.createObjectURL(svgBlob);
+    result = await loadAndDrawImage(blobURL);
+    window.URL.revokeObjectURL(blobURL);
+    if (result && result.byteLength > 100) return result;
+  } catch (e) {
+    console.warn("Blob URL rasterization fallback:", e);
+  }
+
+  // Strategy 3: Fetch static public asset /logo-kemensos.svg
+  try {
+    result = await loadAndDrawImage("/logo-kemensos.svg");
+    if (result && result.byteLength > 100) return result;
+  } catch (e) {
+    console.warn("Static public asset fallback failed:", e);
+  }
+
+  return null;
 }
 
 export async function exportToWord(data: ReportData, photos: PhotoAttachment[]): Promise<void> {
@@ -169,12 +203,18 @@ export async function exportToWord(data: ReportData, photos: PhotoAttachment[]):
     });
   };
 
-  // Add Letterhead (Kop Surat) if configured
-  if (data.kopTipe && data.kopTipe !== "none") {
-    const isKemensos = data.kopTipe === "kemensos";
+  // Add Letterhead (Kop Surat) if configured or auto-detected
+  const hasKopConfigured = data.kopTipe && data.kopTipe !== "none";
+  const isAutoKemensos = !data.kopTipe && (
+    (data.jabatan && data.jabatan.toLowerCase().includes("pkh")) ||
+    (data.unitKerja && data.unitKerja.toLowerCase().includes("sosial"))
+  );
+
+  if (hasKopConfigured || isAutoKemensos) {
+    const isKemensos = data.kopTipe === "kemensos" || isAutoKemensos;
     const kementerian = isKemensos 
       ? "KEMENTERIAN SOSIAL REPUBLIK INDONESIA" 
-      : (data.kopKementerian || "").toUpperCase();
+      : (data.kopKementerian || "INSTANSI REPUBLIK INDONESIA").toUpperCase();
     
     const eselon1 = isKemensos
       ? "DIREKTORAT JENDERAL PERLINDUNGAN DAN JAMINAN SOSIAL"
@@ -447,7 +487,7 @@ export async function exportToWord(data: ReportData, photos: PhotoAttachment[]):
                   new Paragraph({
                     alignment: AlignmentType.LEFT,
                     spacing: { after: 40 },
-                    children: [new TextRun({ text: `${data.tempatPembuatan || "Jakarta"}, ${data.tanggalPembuatan || "15 Juni 2026"}`, font: "Arial", size: 22 })]
+                    children: [new TextRun({ text: `${data.tempatPembuatan || "Jakarta"}, ${extractFormalDateForSignature(data.waktuPelaksanaan, data.tanggalPembuatan)}`, font: "Arial", size: 22 })]
                   }),
                   new Paragraph({
                     alignment: AlignmentType.LEFT,
