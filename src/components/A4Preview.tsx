@@ -1,6 +1,6 @@
 import React from "react";
 import { ReportData, PhotoAttachment } from "../types";
-import { formatJudulLaporan } from "../utils/dateFormatter";
+import { formatJudulLaporan, getReportFileName } from "../utils/dateFormatter";
 
 interface A4PreviewProps {
   data: ReportData;
@@ -11,9 +11,13 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
   return (
     <div className="relative mx-auto bg-slate-100 p-2 sm:p-6 md:p-8 rounded-xl shadow-inner max-w-full overflow-x-auto">
       {/* Help Alert */}
-      <div className="mb-4 bg-emerald-50 text-emerald-800 border-l-4 border-emerald-500 p-3 text-xs rounded shadow-sm no-print">
-        <p className="font-semibold mb-1">💡 Petunjuk Cetak PDF:</p>
-        <p>Gunakan tombol cetak di atas. Di jendela print browser Anda, atur <strong>Tujuan (Destination)</strong> ke <strong>Save as PDF (Simpan ke PDF)</strong>, hilangkan centang Header & Footer, dan centang "Gambar Latar (Background Graphics)" agar gambar dokumentasi tercetak bersih.</p>
+      <div className="mb-4 bg-emerald-50 text-emerald-900 border-l-4 border-emerald-500 p-3.5 text-xs rounded-xl shadow-xs no-print">
+        <p className="font-bold mb-1 flex items-center gap-1.5 text-emerald-800">
+          <span>💡</span> Petunjuk Simpan Dokumen PDF:
+        </p>
+        <p className="text-emerald-800/90 leading-relaxed">
+          Klik tombol <strong>Simpan PDF (.pdf)</strong> di atas. Dialog browser akan otomatis membuka dengan nama berkas standar naskah dinas: <code className="bg-emerald-100 text-emerald-950 font-bold px-1.5 py-0.5 rounded text-[11px] font-mono">{getReportFileName(data)}.pdf</code>. Pastikan opsi <em>Tujuan / Destination</em> diatur ke <strong>Save as PDF (Simpan sebagai PDF)</strong>.
+        </p>
       </div>
 
       {/* Styled A4 page mimicking high-quality Indonesian Civil Service Report */}

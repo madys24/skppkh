@@ -99,10 +99,14 @@ INTEGRATE THIS ASSIGNMENT LETTER INTO THE REPORT:
     }
 
     const prompt = `
-Generate a fully structured, hyper-focused, and highly detailed RHK (Rencana Hasil Kerja) report for MyASN with properties matching the job of a "${jabatan}" focusing on RHK Utama: "${rhkUtama}".
+Generate a fully structured, hyper-focused, comprehensive, and exhaustive RHK (Rencana Hasil Kerja) report for MyASN matching the job of "${jabatan}" focusing on RHK Utama: "${rhkUtama}".
+
+PENTING - TINGKAT KEDALAMAN DAN PANJANG NARASI:
+Hasil laporan HARUS SANGAT PANJANG, MENDALAM, TERSTRUKTUR, DAN MENGHASILKAN MINIMAL 2 HINGGA 3 HALAMAN NASKAH A4 (tidak termasuk lampiran foto).
+Gunakan gaya bahasa naskah dinas formal birokrasi pemerintahan Republik Indonesia (PUEBI), bernuansa akademis-birokratis, dan menerapkan Core Values BerAKHLAK (Berorientasi Pelayanan, Akuntabel, Kompeten, Harmonis, Loyal, Adaptif, Kolaboratif).
 
 CRITICAL DISCIPLINE & DIRECTIVE:
-1. STRICT TRUTH-ANCHORING (TIDAK NGELANTUR): Do NOT make up, assume, or hallucinate arbitrary locations, dates, or participants. Focus 100% of the narrative on the concrete problem, chosen action plan, and activities provided.
+1. STRICT TRUTH-ANCHORING (TIDAK NGELANTUR): Fokus 100% pada rencana aksi, data faktual lapangan, lokasi, waktu, dan pihak yang terlibat yang telah ditentukan.
 2. NARRATIVE GROUNDING:
    - "Rencana Aksi" yang dipilih: "${rencanaAksi}"
    - "Kegiatan yang dilaksanakan" (Ringkasan Kasar): "${ringkasanKegiatan}"
@@ -110,11 +114,17 @@ CRITICAL DISCIPLINE & DIRECTIVE:
    - "Tempat Kegiatan": "${tempatPelaksanaan}"
    - "Pihak yang Terlibat / Diikuti Oleh": "${pihakTerlibat}"
 
-3. REQUIRED NARRATIVE EXPANSION (Must be covered in detail in the generated blocks below):
-   - Pelaksanaan: Detail the technical and administrative steps of how the action plan "${rencanaAksi}" was executed using "${ringkasanKegiatan}".
-   - Waktu: Elaborate directly on "${waktuPelaksanaan}" as the formal duration of the work.
-   - Tempat: Explicitly describe the condition and physical setting of "${tempatPelaksanaan}" where the tasks took place.
-   - Diikuti oleh siapa saja: Describe the roles, coordination, and interactions with "${pihakTerlibat}" during the implementation.
+3. REQUIRED NARRATIVE EXPANSION (Wajib Sangat Rinci & Panjang di Setiap Bab):
+   - A.1 Pendahuluan (Umum): Minimal 3-4 paragraf panjang yang memaparkan latar belakang makro reformasi birokrasi, dinamika pelayanan publik, peran strategis posisi jabatan "${jabatan}", dan konteks instansional perlindungan sosial/pelayanan negara.
+   - A.2 Pendahuluan (Maksud dan Tujuan): Uraian naratif mendalam yang membedah Maksud pembuatan laporan pertanggungjawaban serta Tujuan Umum dan Khusus (peningkatan kinerja individu, akuntabilitas, transparansi, dan ketercapaian target instansi).
+   - A.3 Pendahuluan (Ruang Lingkup): Minimal 2 paragraf komprehensif menguraikan batasan wilayah kerja di "${tempatPelaksanaan}", kelompok sasaran "${pihakTerlibat}", batasan periode waktu "${waktuPelaksanaan}", serta tahapan tata kelola administrasi.
+   - A.4 Pendahuluan (Dasar): Minimal 5-7 butir landasan hukum lengkap (UU No. 20/2023 tentang ASN, UU No. 11/2009 Kesejahteraan Sosial jika relevan, Peraturan MenPAN-RB pengelolaan kinerja ASN, Permensos/peraturan teknis kementerian terkait, Kepdirjen, dan Surat Tugas jika ada).
+   - B. Kegiatan yang Dilaksanakan: Minimal 4-5 paragraf narasi kronologis terinci dari tahap persiapan teknis/konsolidasi data, tahap pelaksanaan operasional lapangan, koordinasi dengan "${pihakTerlibat}", penanganan kasus/kendala, hingga verifikasi dan monitoring mutu.
+   - C. Hasil yang Dicapai: Minimal 4 paragraf komprehensif menguraikan capaian kuantitatif (target 100%, rekapitulasi data), capaian kualitatif (kepuasan penerima layanan, peningkatan kapasitas), serta dampak strategis terhadap pencapaian kinerja "${unitKerja}".
+   - D. Simpulan dan Saran: 
+     * Kesimpulan: Minimal 2 paragraf evaluasi analitis atas pencapaian kinerja, kepatuhan terhadap SOP, dan konsistensi pelayanan.
+     * Saran: Minimal 3-5 poin rekomendasi taktis, strategis, dan solutif untuk peningkatan efektivitas operasional, koordinasi lintas pemangku kepentingan, dan keberlanjutan program.
+   - E. Penutup: 2 paragraf pernyataan penutup kedinasan formal, penegasan komitmen integritas, dan permohonan arahan evaluasi berkala kepada Pejabat Penilai Kinerja.
 
 ${assignmentLetterContext}
 ${letterheadContext}
@@ -126,25 +136,21 @@ Additional information:
 - Target Waktu Periode: ${targetWaktu || "Bulanan/Tahunan"}
 - Kontribusi terhadap Unit Kerja: ${peranInstansi || "(Belum Diatur)"}
 
-Generate comprehensive, professional, and detailed content in formal Indonesian governmental language (Bahasa Indonesia Baku/PUEBI). Make every section rich, highly realistic, and tightly cohesive with the facts provided.
-
-For 'dasar' (A.4), please include realistic citations of relevant legal bases (such as Undang-Undang No. 20 Tahun 2023 tentang Aparatur Sipil Negara, Peraturan Pemerintah/Permenpan-RB that corresponds to the job position e.g., for computer staff/teachers/etc., and internal local policies) in addition to any Assignment Letter mentioned.
-
 Return exactly a JSON object conforming to this schema (do not wrap in markdown tags other than the raw JSON output):
 {
   "pendahuluan": {
-    "umum": "Latar belakang umum yang mendalam dan kontekstual terkait tugas jabatan ini dalam mendukung pembangunan instansi nasional.",
-    "maksudDanTujuan": "Penjelasan rinci maksud penyusunan laporan Rencana Hasil Kerja ini dan tujuan pencapaian indikator kinerja individu.",
-    "ruangLingkup": "Batasan serta cakupan kegiatan yang dilaporkan selama periode waktu yang ditentukan.",
-    "dasar": "Daftar dasar hukum dan peraturan perundang-undangan (UU ASN, Permenpan, Perpres, SK, dll) yang relevan dan mendasari penugasan."
+    "umum": "Latar belakang umum yang mendalam dan kontekstual (3-4 paragraf panjang) terkait tugas jabatan ini dalam mendukung pembangunan instansi nasional.",
+    "maksudDanTujuan": "Penjelasan rinci maksud penyusunan laporan dan poin-poin tujuan pencapaian indikator kinerja individu secara terperinci.",
+    "ruangLingkup": "Batasan serta cakupan kegiatan yang dilaporkan secara detail (wilayah, target, waktu, dan administrasi).",
+    "dasar": "Daftar lengkap dasar hukum dan peraturan perundang-undangan (UU ASN, Permenpan, Permensos, SK, Surat Tugas, dll) yang relevan dan mendasari penugasan."
   },
-  "kegiatanLaksana": "Deskripsi rinci mengenai proses pelaksanaan kegiatan sehari-hari dari hulu ke hilir untuk merealisasikan RHK tersebut.",
-  "hasilDicapai": "Kuantitas, kualitas, serta dampak nyata (output & outcome) dari hasil kerja keras yang telah dicapai, diselaraskan dengan sasaran unit kerja.",
+  "kegiatanLaksana": "Deskripsi sangat rinci dan kronologis (4-5 paragraf) mengenai proses pelaksanaan kegiatan sehari-hari dari persiapan, eksekusi lapangan, hingga mitigasi kendala.",
+  "hasilDicapai": "Uraian mendalam mengenai kuantitas, kualitas, serta dampak nyata (output & outcome) dari hasil kerja keras yang telah dicapai, diselaraskan dengan sasaran unit kerja.",
   "simpulanDanSaran": {
-    "kesimpulan": "Deskripsi penarikan kesimpulan akhir yang kritis mengenai tingkat keberhasilan pencapaian target kerja.",
-    "saran": "Rekomendasi taktis dan konstruktif untuk perbaikan berkelanjutan pelaksanaan kegiatan di masa mendatang."
+    "kesimpulan": "Deskripsi penarikan kesimpulan analitis mendalam mengenai tingkat keberhasilan pencapaian target kerja.",
+    "saran": "Rekomendasi taktis dan konstruktif (3-5 poin konkret) untuk perbaikan berkelanjutan pelaksanaan kegiatan di masa mendatang."
   },
-  "penutup": "Pernyataan penutup formal serta ucapan terima kasih atas kolaborasi yang terjalin."
+  "penutup": "Pernyataan penutup formal kedinasan (2 paragraf) serta komitmen berkelanjutan atas tugas yang diamanahkan."
 }
 `;
 

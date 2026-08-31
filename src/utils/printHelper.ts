@@ -271,6 +271,9 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
     document.body.removeChild(printFrame);
   }
 
+  const origTitle = document.title;
+  document.title = fileName;
+
   printFrame = document.createElement("iframe");
   printFrame.id = "pdf-print-iframe";
   printFrame.style.position = "fixed";
@@ -287,18 +290,21 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
   const frameDoc = printFrame.contentDocument || printFrame.contentWindow?.document;
   if (!frameDoc) {
     // Fallback: direct window.print()
-    const origTitle = document.title;
-    document.title = fileName;
     window.print();
     setTimeout(() => {
       document.title = origTitle;
-    }, 1000);
+    }, 2000);
     return;
   }
 
   frameDoc.open();
   frameDoc.write(fullHtml);
   frameDoc.close();
+
+  // Ensure title is also set on the frame document
+  try {
+    frameDoc.title = fileName;
+  } catch {}
 
   // Wait for images and layout inside iframe to be fully ready before printing
   setTimeout(() => {
@@ -312,12 +318,12 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
       }
     } catch (e) {
       console.warn("Iframe print error, falling back to window.print():", e);
-      const origTitle = document.title;
-      document.title = fileName;
       window.print();
+    } finally {
+      // Restore title after dialog closes
       setTimeout(() => {
         document.title = origTitle;
-      }, 1000);
+      }, 3000);
     }
   }, 400);
 }

@@ -246,27 +246,90 @@ export default function App() {
       
       // High quality offline fallback generator if Gemini Key is absent / unconfigured in preview
       setTimeout(() => {
+        const isKemensos = inputs.kopTipe === "kemensos" || (inputs.jabatan && inputs.jabatan.toLowerCase().includes("pkh"));
+        
         const fallbackReport: ReportData = {
           ...inputs,
           pendahuluan: {
-            umum: `Laporan ini disusun sebagai bentuk pertanggungjawaban objektif atas realisasi Rencana Hasil Kerja (RHK) jabatan ${inputs.jabatan || "Aparatur Sipil Negara"} di lingkungan ${inputs.unitKerja || "instansi pemerintah"}. Hubungan kerja difokuskan untuk menyelesaikan permasalahan substantif melalui Rencana Aksi '${inputs.rencanaAksi}'. Dinamika reformasi birokrasi menuntut kesiapan aparatur secara berintegritas dan tangkas demi terciptanya akselerasi pelayanan publik nasional prima.`,
-            maksudDanTujuan: `Maksud dari penyampaian draf berkas ini adalah untuk memaparkan perkembangan kuantitas dan kualitas target individu yang dilaksanakan pada ${inputs.waktuPelaksanaan}. Tujuannya adalah menyelaraskan sasaran kerja personal dengan peta strategis instansi demi optimalisasi tata laksana birokrasi.`,
-            ruangLingkup: `Sesuai dengan target waktu ${inputs.targetWaktu || "Triwulanan"}, laporan realisasi ini berfokus secara eksklusif pada pembuktian dokumen, analisis dampak logis, serta pencapaian output kerja di unit ${inputs.unitKerja || "Unit pelayanan"} bertempat di ${inputs.tempatPelaksanaan}.`,
+            umum: `Dalam kerangka tata kelola pemerintahan yang baik (good governance) dan akselerasi reformasi birokrasi, peningkatan kinerja aparatur sipil negara menjadi pilar fundamental dalam menjamin mutu serta kesinambungan pelayanan publik. Sebagai pejabat fungsional ${inputs.jabatan || "Aparatur Sipil Negara"} di lingkungan ${inputs.unitKerja || "instansi pemerintah"}, perwujudan akuntabilitas kinerja individu harus senantiasa terhubung langsung dengan target strategis organisasi, khususnya dalam merealisasikan Rencana Hasil Kerja (RHK) utama: "${inputs.rhkUtama}".
+
+${isKemensos 
+  ? `Penyelenggaraan program perlindungan dan jaminan sosial nasional menuntut ketepatan sasaran, keterpaduan data, serta responsivitas tinggi dari para pendamping di garis terdepan. Dinamika di lapangan mengharuskan pelaksanaan kegiatan '${inputs.rencanaAksi}' dijalankan dengan disiplin tinggi, integritas tanpa kompromi, dan komitmen pelayanan prima demi menjamin hak-hak sosial Keluarga Penerima Manfaat (KPM) terlindungi secara optimal.`
+  : `Pelaksanaan tugas kedinasan pada unit ${inputs.unitKerja || "pelayanan"} menuntut efisiensi operasional, ketepatan metode kerja, dan sinergi lintas fungsi. Penyelenggaraan Rencana Aksi '${inputs.rencanaAksi}' merupakan langkah konkret dalam menjawab tantangan pelayanan publik dan mendukung pencapaian indikator kinerja utama instansi.`}
+
+Laporan ini disusun sebagai dokumen pertanggungjawaban komprehensif atas pelaksanaan tugas kedinasan yang telah diselesaikan. Melalui laporan ini, seluruh rangkaian aktivitas, metodologi pelaksanaan, kendala yang dihadapi, hingga capaian keluaran (output) dan manfaat (outcome) didokumentasikan secara transparan, sistematis, dan akuntabel sesuai dengan Core Values ASN BerAKHLAK.`,
+            
+            maksudDanTujuan: `Penyusunan Laporan Pelaksanaan Rencana Hasil Kerja ini memiliki maksud dan tujuan kedinasan yang terukur, antara lain:
+
+1. Maksud:
+   a. Menyediakan dokumen pertanggungjawaban administratif dan substantif yang formal atas realisasi Rencana Aksi '${inputs.rencanaAksi}'.
+   b. Menyajikan rekapitulasi data faktual dan kronologi pelaksanaan kegiatan yang diselenggarakan pada ${inputs.waktuPelaksanaan} bertempat di ${inputs.tempatPelaksanaan}.
+   c. Menjadi media transparansi dan akuntabilitas kinerja personal kepada pimpinan unit kerja dan Pejabat Penilai Kinerja.
+
+2. Tujuan:
+   a. Memastikan seluruh tahapan kegiatan berjalan sesuai dengan Standar Operasional Prosedur (SOP) dan regulasi yang berlaku.
+   b. Mengukur tingkat efektivitas dan efisiensi pelaksanaan tugas dalam mendukung target ${inputs.targetWaktu || "periode berjalan"}.
+   c. Mengidentifikasi faktor pendukung serta hambatan di lapangan guna merumuskan langkah perbaikan berkelanjutan.
+   d. Memberikan kontribusi nyata terhadap pencapaian sasaran unit kerja: ${inputs.peranInstansi || "Penunjang kelancaran tugas institusi"}.`,
+            
+            ruangLingkup: `Ruang lingkup pelaksanaan kegiatan dan penyusunan laporan ini dibatasi pada aspek-aspek kedinasan sebagai berikut:
+
+1. Batasan Substantif dan Teknis: Meliputi serangkaian proses perencanaan, konsolidasi instrumen kerja, pelaksanaan operasional lapangan dari Rencana Aksi '${inputs.rencanaAksi}', fasilitasi kendala teknis, serta verifikasi kelengkapan bukti dukung (evidence).
+2. Batasan Kewilayahan dan Sasaran: Dilaksanakan secara terfokus pada lokus kerja bertempat di ${inputs.tempatPelaksanaan}, dengan melibatkan secara aktif ${inputs.pihakTerlibat}.
+3. Batasan Waktu: Pelaksanaan kegiatan diselenggarakan sepenuhnya pada rentang waktu ${inputs.waktuPelaksanaan} dalam periode penilaian target ${inputs.targetWaktu || "berjalan"}.`,
+            
             dasar: inputs.hasSuratTugas
-              ? `1. Surat Tugas ${inputs.suratTugasPemberi || "Pejabat Pemberi Tugas"} Nomor ${inputs.suratTugasNomor || "-"} tanggal ${inputs.suratTugasTanggal || "-"} perihal ${inputs.suratTugasPerihal || "-"}.\n2. Undang-Undang Republik Indonesia Nomor 20 Tahun 2023 tentang Aparatur Sipil Negara.\n3. Peraturan Menteri PANRB Terkait Jabatan Fungsional ${inputs.jabatan || "Sipil Negara"}.\n4. Sasaran Kinerja Pegawai (SKP) pada aplikasi internal MyASN.`
-              : `1. Undang-Undang Republik Indonesia Nomor 20 Tahun 2023 tentang Aparatur Sipil Negara.\n2. Peraturan Menteri PANRB Terkait Jabatan Fungsional ${inputs.jabatan || "Sipil Negara"}.\n3. Sasaran Kinerja Pegawai (SKP) pada aplikasi internal MyASN.`
+              ? `1. Surat Tugas dari ${inputs.suratTugasPemberi || "Pejabat Pembina Kepegawaian"} Nomor: ${inputs.suratTugasNomor || "-"} tanggal ${inputs.suratTugasTanggal || "-"} perihal ${inputs.suratTugasPerihal || "-"}.\n2. Undang-Undang Republik Indonesia Nomor 20 Tahun 2023 tentang Aparatur Sipil Negara.\n3. Undang-Undang Republik Indonesia Nomor 11 Tahun 2009 tentang Kesejahteraan Sosial.\n4. Peraturan Menteri Pendayagunaan Aparatur Negara dan Reformasi Birokrasi Nomor 6 Tahun 2022 tentang Pengelolaan Kinerja Pegawai Aparatur Sipil Negara.\n5. Peraturan Menteri Sosial Republik Indonesia terkait Petunjuk Teknis Pelaksanaan Program Jaminan Sosial.\n6. Sasaran Kinerja Pegawai (SKP) pada unit kerja ${inputs.unitKerja || "instansi"}.`
+              : `1. Undang-Undang Republik Indonesia Nomor 20 Tahun 2023 tentang Aparatur Sipil Negara.\n2. Undang-Undang Republik Indonesia Nomor 11 Tahun 2009 tentang Kesejahteraan Sosial.\n3. Peraturan Menteri Pendayagunaan Aparatur Negara dan Reformasi Birokrasi Nomor 6 Tahun 2022 tentang Pengelolaan Kinerja Pegawai Aparatur Sipil Negara.\n4. Peraturan Menteri Sosial Republik Indonesia terkait Petunjuk Teknis Pelaksanaan Program Jaminan Sosial.\n5. Keputusan Direktur Jenderal Perlindungan dan Jaminan Sosial tentang Pedoman Operasional Program.\n6. Sasaran Kinerja Pegawai (SKP) pada unit kerja ${inputs.unitKerja || "instansi"}.`
           },
-          kegiatanLaksana: `Dalam mewujudkan rencana kerja utama "${inputs.rhkUtama}" dan mengoptimalkan Rencana Aksi "${inputs.rencanaAksi}", serangkaian aktivitas fungsional strategis telah dituntaskan dengan rincian pelaksanaan sebagai berikut:\n\n1. Pelaksanaan Teknis: Kegiatan ini dilaksanakan bertempat di ${inputs.tempatPelaksanaan}.\n2. Waktu Pelaksanaan: Aktivitas diselenggarakan sepenuhnya pada ${inputs.waktuPelaksanaan} guna menjamin konsistensi performa fungsional.\n3. Rincian Kegiatan Riil:\n${inputs.ringkasanKegiatan}\n\nSetiap proses pelaporan dilaksanakan secara transparan, akuntabel, dan didasarkan pada core values ASN BerAKHLAK.`,
-          hasilDicapai: `Dari pelaksanaan aktivitas fungsional tersebut, hasil dan dampak nyata (output & outcome) yang berhasil didokumentasikan meliputi:\n\n1. Target kuantitatif dan kualitatif dari Rencana Aksi berhasil dicapai secara prima bersama ${inputs.pihakTerlibat}.\n2. Kualitas keluaran (output) dinilai handal berkat kerja sama sinergis serta memberikan kontribusi berupa: ${inputs.peranInstansi || "Penunjang kinerja unit kerja"}.\n3. Berhasil mendokumentasikan bukti fisik (evidence) pendukung untuk diajukan ke portal penilaian MyASN ke bidang ${inputs.unitKerja}.`,
+          
+          kegiatanLaksana: `Pelaksanaan Rencana Hasil Kerja dengan Rencana Aksi "${inputs.rencanaAksi}" dilaksanakan secara bertahap, terstruktur, dan akuntabel melalui serangkaian tahapan operasional sebagai berikut:
+
+1. Tahap Persiapan dan Koordinasi Awal:
+   Sebelum turun ke lokasi pelaksanaan di ${inputs.tempatPelaksanaan}, pelapor melakukan penyiapan data awal, penyusunan daftar periksa (checklist), serta koordinasi teknis bersama unsur-unsur terkait (${inputs.pihakTerlibat}). Hal ini dilakukan guna memastikan kesiapan instrumen kerja, kejelasan pembagian tugas, dan meminimalkan potensi kendala teknis saat pelaksanaan di lapangan.
+
+2. Tahap Pelaksanaan Operasional Lapangan:
+   Pada ${inputs.waktuPelaksanaan}, pelapor melaksanakan rangkaian tugas kedinasan secara langsung di ${inputs.tempatPelaksanaan}. Adapun rincian fakta kegiatan yang dilaksanakan mencakup:
+${inputs.ringkasanKegiatan.split('\n').map((line: string) => line.trim().startsWith('-') ? `   ${line}` : `   - ${line}`).join('\n')}
+
+3. Tahap Interaksi dan Komunikasi Sektoral:
+   Sepanjang kegiatan, pelapor membangun komunikasi yang harmonis dan kolaboratif bersama ${inputs.pihakTerlibat}. Dialog interaktif, pendampingan persuasif, dan penjelasan administratif diberikan secara transparan untuk memastikan seluruh pihak memahami substansi dan regulasi yang berlaku.
+
+4. Tahap Pengendalian dan Penyelesaian Kendala:
+   Setiap kendala yang muncul di lapangan langsung diidentifikasi, diklarifikasi, dan dikoordinasikan solusinya dengan cepat dan tepat tanpa melanggar ketentuan hukum. Seluruh proses didokumentasikan dengan cermat sebagai bukti fisik (evidence) pendukung laporan kinerja.`,
+          
+          hasilDicapai: `Berdasarkan seluruh rangkaian aktivitas fungsional yang telah dituntaskan di ${inputs.tempatPelaksanaan} pada ${inputs.waktuPelaksanaan}, hasil-hasil konkret dan dampak strategis (output dan outcome) yang berhasil dicapai adalah sebagai berikut:
+
+1. Capaian Kuantitatif:
+   a. Seluruh target volume kerja dari Rencana Aksi '${inputs.rencanaAksi}' terealisasi 100% tepat waktu sesuai dengan jadwal yang telah ditetapkan.
+   b. Partisipasi dan kehadiran dari unsur yang terlibat (${inputs.pihakTerlibat}) berjalan optimal dengan tingkat keikutsertaan yang sangat tinggi dan tertib administrasi.
+   c. Berhasil menghimpun dan memverifikasi kelengkapan dokumen pendukung (evidence), berkas administrasi, dan dokumentasi foto kegiatan secara lengkap.
+
+2. Capaian Kualitatif:
+   a. Terwujudnya pemahaman yang utuh, kesadaran tertib aturan, dan peningkatan kepuasan dari seluruh pihak/masyarakat yang dilayani.
+   b. Proses pelaksanaan berjalan dengan aman, lancar, transparan, dan bebas dari segala bentuk penyimpangan maupun pungutan liar.
+   c. Terjaganya integritas data dan ketaatan penuh terhadap Standar Operasional Prosedur (SOP) kedinasan.
+
+3. Kontribusi terhadap Sasaran Kinerja Organisasi:
+   Capaian ini memberikan kontribusi langsung dan nyata terhadap kinerja ${inputs.unitKerja || "unit kerja"}, yakni: ${inputs.peranInstansi || "Mewujudkan pelayanan prima, transparansi data, dan akuntabilitas program nasional"}.`,
+          
           simpulanDanSaran: {
-            kesimpulan: `Pelaksanaan rencana hasil kerja untuk posisi ${inputs.jabatan} telaksana secara komprehensif, tepat waktu, dan akuntabel sesuai dengan parameter target ${inputs.targetWaktu} bertempat di ${inputs.tempatPelaksanaan}.`,
-            saran: `Disarankan untuk mempertahankan intensitas kolaborasi bersama ${inputs.pihakTerlibat} serta mengoptimalkan sarana pendukung teknologi demi keberlanjutan rencana hasil kerja di era digital.`
+            kesimpulan: `1. Pelaksanaan Rencana Hasil Kerja (RHK) jabatan ${inputs.jabatan} melalui Rencana Aksi "${inputs.rencanaAksi}" pada ${inputs.waktuPelaksanaan} di ${inputs.tempatPelaksanaan} telah terlaksana dengan sangat baik, lancar, dan mencapai 100% dari target yang direncanakan.
+
+2. Kolaborasi yang solid dan komunikasi yang harmonis bersama ${inputs.pihakTerlibat} menjadi faktor kunci keberhasilan pelaksanaan tugas, sekaligus membuktikan penerapan nyata nilai-nilai dasar ASN BerAKHLAK di lapangan.`,
+            
+            saran: `1. Disarankan untuk terus mempertahankan dan meningkatkan intensitas koordinasi berkala bersama ${inputs.pihakTerlibat} guna memperkuat sinergi kerja di masa mendatang.
+2. Perlu dilakukan pemantauan berkelanjutan dan pemutakhiran data secara berkala agar kesinambungan hasil kegiatan tetap terjaga secara optimal.
+3. Mengoptimalkan pemanfaatan sarana teknologi digital dan sistem informasi kepegawaian dalam percepatan pelaporan serta pengarsipan dokumen evidence secara terpusat.`
           },
-          penutup: `Demikian laporan realisasi ini dibuat agar dapat dipergunakan sebagaimana mestinya untuk bahan pertimbangan evaluasi berkala oleh Pejabat Penilai Kinerja.`
+          
+          penutup: `Demikian Laporan Pelaksanaan Rencana Hasil Kerja ini disusun dengan sebenar-benarnya berdasarkan fakta dan kondisi riil di lapangan, sebagai wujud transparansi, loyalitas, dan akuntabilitas kinerja personal.
+
+Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai capaian target kerja yang telah dilaksanakan, serta dapat dijadikan bahan evaluasi, telaah, dan pertimbangan bagi Pejabat Penilai Kinerja dalam rangka penyempurnaan pelaksanaan program di masa yang akan datang.`
         };
         setReport(fallbackReport);
         setStep("workspace");
-      }, 4000); // simulation delay for nice user transition
+      }, 3500); // simulation delay for nice user transition
     } finally {
       clearTimeout(timer1);
       clearTimeout(timer2);
@@ -1170,18 +1233,22 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2.5">
                   <button
                     onClick={() => exportToWord(report, photos)}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-blue-100 hover:bg-blue-200 text-blue-800 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                    title="Unduh dokumen dalam format Microsoft Word (.docx) dengan logo Kemensos & Tata Naskah Dinas presisi"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 rounded-xl text-xs font-bold transition-all shadow-xs hover:shadow cursor-pointer active:scale-95"
                   >
-                    <Download className="w-4 h-4 shrink-0" /> Ekspor Word (Docx)
+                    <Download className="w-4 h-4 shrink-0 text-blue-600" />
+                    <span>Unduh Word (.docx)</span>
                   </button>
                   <button
                     onClick={triggerNativePrint}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition-all cursor-pointer"
+                    title="Simpan dokumen sebagai PDF (.pdf) dengan penamaan berkas otomatis standar kepegawaian"
+                    className="flex items-center gap-2 px-4.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl text-xs font-bold shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95"
                   >
-                    <Printer className="w-4 h-4 shrink-0" /> Cetak / Simpan PDF
+                    <FileText className="w-4 h-4 shrink-0 text-emerald-100" />
+                    <span>Simpan PDF (.pdf)</span>
                   </button>
                 </div>
               </div>
