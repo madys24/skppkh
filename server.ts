@@ -99,58 +99,61 @@ INTEGRATE THIS ASSIGNMENT LETTER INTO THE REPORT:
     }
 
     const prompt = `
-Generate a fully structured, hyper-focused, comprehensive, and exhaustive RHK (Rencana Hasil Kerja) report for MyASN matching the job of "${jabatan}" focusing on RHK Utama: "${rhkUtama}".
+Anda adalah seorang petugas/pendamping lapangan profesional yang berpengalaman dalam menyusun laporan pertanggungjawaban kegiatan operasional riil.
+Tugas Anda adalah menyusun Laporan Rencana Hasil Kerja (RHK) jabatan "${jabatan}" yang berfokus pada RHK Utama: "${rhkUtama}".
 
-PENTING - TINGKAT KEDALAMAN DAN PANJANG NARASI:
-Hasil laporan HARUS SANGAT PANJANG, MENDALAM, TERSTRUKTUR, DAN MENGHASILKAN MINIMAL 2 HINGGA 3 HALAMAN NASKAH A4 (tidak termasuk lampiran foto).
-Gunakan gaya bahasa naskah dinas formal birokrasi pemerintahan Republik Indonesia (PUEBI), bernuansa akademis-birokratis, dan menerapkan Core Values BerAKHLAK (Berorientasi Pelayanan, Akuntabel, Kompeten, Harmonis, Loyal, Adaptif, Kolaboratif).
+PANDUAN GAYA BAHASA LAPORAN PETUGAS LAPANGAN:
+1. GAYA BAHASA: Bersifat naratif deskriptif, mengalir, natural, komunikatif, dan tidak kaku/tidak terlalu formal teoritis. Ceritakan secara hidup apa yang sebenarnya dilakukan, diamati, dan dihadapi langsung oleh petugas di lapangan.
+2. SUDUT PANDANG: Laporan praktisi/petugas lapangan yang bertindak secara nyata, menyapa warga/sasaran, berkoordinasi dengan aparat setempat, melakukan pengecekan data langsung, menyelesaikan kendala riil di lapangan, dan mencatat hasil secara tertib.
+3. WAJIB HILANGKAN POIN-POIN & PENOMORAN: DILARANG KERAS menggunakan format daftar berbutir, simbol strip (-), bullet (•), maupun penomoran angka/huruf (seperti 1., 2., a., b.) di dalam teks isi narasi. Seluruh bagian laporan WAJIB ditulis murni dalam bentuk PARAGRAF NARASI yang mengalir rapi.
+4. PERLUAS NARASI LAPANGAN: Jabarkan secara rinci dan mendalam dalam beberapa paragraf panjang di tiap bagian untuk menghasilkan laporan yang utuh, komprehensif, dan kaya detail operasional.
 
-CRITICAL DISCIPLINE & DIRECTIVE:
-1. STRICT TRUTH-ANCHORING (TIDAK NGELANTUR): Fokus 100% pada rencana aksi, data faktual lapangan, lokasi, waktu, dan pihak yang terlibat yang telah ditentukan.
-2. NARRATIVE GROUNDING:
-   - "Rencana Aksi" yang dipilih: "${rencanaAksi}"
-   - "Kegiatan yang dilaksanakan" (Ringkasan Kasar): "${ringkasanKegiatan}"
-   - "Waktu Kegiatan": "${waktuPelaksanaan}"
-   - "Tempat Kegiatan": "${tempatPelaksanaan}"
-   - "Pihak yang Terlibat / Diikuti Oleh": "${pihakTerlibat}"
-
-3. REQUIRED NARRATIVE EXPANSION (Wajib Sangat Rinci & Panjang di Setiap Bab):
-   - A.1 Pendahuluan (Umum): Minimal 3-4 paragraf panjang yang memaparkan latar belakang makro reformasi birokrasi, dinamika pelayanan publik, peran strategis posisi jabatan "${jabatan}", dan konteks instansional perlindungan sosial/pelayanan negara.
-   - A.2 Pendahuluan (Maksud dan Tujuan): Uraian naratif mendalam yang membedah Maksud pembuatan laporan pertanggungjawaban serta Tujuan Umum dan Khusus (peningkatan kinerja individu, akuntabilitas, transparansi, dan ketercapaian target instansi).
-   - A.3 Pendahuluan (Ruang Lingkup): Minimal 2 paragraf komprehensif menguraikan batasan wilayah kerja di "${tempatPelaksanaan}", kelompok sasaran "${pihakTerlibat}", batasan periode waktu "${waktuPelaksanaan}", serta tahapan tata kelola administrasi.
-   - A.4 Pendahuluan (Dasar): Minimal 5-7 butir landasan hukum lengkap (UU No. 20/2023 tentang ASN, UU No. 11/2009 Kesejahteraan Sosial jika relevan, Peraturan MenPAN-RB pengelolaan kinerja ASN, Permensos/peraturan teknis kementerian terkait, Kepdirjen, dan Surat Tugas jika ada).
-   - B. Kegiatan yang Dilaksanakan: Minimal 4-5 paragraf narasi kronologis terinci dari tahap persiapan teknis/konsolidasi data, tahap pelaksanaan operasional lapangan, koordinasi dengan "${pihakTerlibat}", penanganan kasus/kendala, hingga verifikasi dan monitoring mutu.
-   - C. Hasil yang Dicapai: Minimal 4 paragraf komprehensif menguraikan capaian kuantitatif (target 100%, rekapitulasi data), capaian kualitatif (kepuasan penerima layanan, peningkatan kapasitas), serta dampak strategis terhadap pencapaian kinerja "${unitKerja}".
-   - D. Simpulan dan Saran: 
-     * Kesimpulan: Minimal 2 paragraf evaluasi analitis atas pencapaian kinerja, kepatuhan terhadap SOP, dan konsistensi pelayanan.
-     * Saran: Minimal 3-5 poin rekomendasi taktis, strategis, dan solutif untuk peningkatan efektivitas operasional, koordinasi lintas pemangku kepentingan, dan keberlanjutan program.
-   - E. Penutup: 2 paragraf pernyataan penutup kedinasan formal, penegasan komitmen integritas, dan permohonan arahan evaluasi berkala kepada Pejabat Penilai Kinerja.
+INFORMASI FAKTUAN KEGIATAN:
+- Rencana Aksi yang dijalankan: "${rencanaAksi}"
+- Ringkasan Catatan Kegiatan Lapangan: "${ringkasanKegiatan}"
+- Waktu Pelaksanaan: "${waktuPelaksanaan}"
+- Tempat / Lokasi Kegiatan: "${tempatPelaksanaan}"
+- Pihak yang Terlibat / Ditemui: "${pihakTerlibat}"
 
 ${assignmentLetterContext}
 ${letterheadContext}
 
-Additional information:
-- Reporter Name: ${nama || "(Belum Diatur)"}
-- NIP: ${nip || "(Belum Diatur)"}
-- Unit Kerja: ${unitKerja || "(Belum Diatur)"}
-- Target Waktu Periode: ${targetWaktu || "Bulanan/Tahunan"}
-- Kontribusi terhadap Unit Kerja: ${peranInstansi || "(Belum Diatur)"}
+RINCIAN PENYUSUNAN SETIAP BAGIAN DALAM BENTUK PARAGRAF NARASI:
+- A. PENDAHULUAN:
+  * 1. Umum: 2-3 paragraf narasi mengalir yang memaparkan latar belakang pelaksanaan tugas lapangan ini, pentingnya kegiatan bagi masyarakat di lokasi kerja, serta peran aktif petugas dalam memastikan program berjalan lancar.
+  * 2. Maksud dan Tujuan: 2 paragraf narasi mengalir (tanpa poin 1/2 atau a/b) yang menguraikan maksud kehadiran petugas di lapangan serta target praktis yang ingin dicapai demi keteraturan pelayanan dan kepuasan warga.
+  * 3. Ruang Lingkup: 2 paragraf narasi mengalir yang merinci cakupan wilayah di "${tempatPelaksanaan}", sasaran warga/pihak yang ditemui ("${pihakTerlibat}"), serta batas waktu pelaksanaan kegiatan tanpa penomoran baris.
+  * 4. Dasar: 1-2 paragraf narasi mengalir yang menyebutkan surat tugas penugasan, regulasi atau petunjuk teknis terkait, serta target sasaran kinerja pegawai sebagai landasan resmi pelaksanaan tugas.
+- B. KEGIATAN YANG DILAKSANAKAN:
+  * 4-5 paragraf narasi kronologis yang menceritakan perjalanan dan aktivitas petugas dari awal persiapan perlengkapan, kehadiran di lokasi "${tempatPelaksanaan}", interaksi ramah dan dialog bersama "${pihakTerlibat}", penanganan teknis/proses kerja lapangan, hingga verifikasi akhir dan dokumentasi bukti kegiatan.
+- C. HASIL YANG DICAPAI:
+  * 3-4 paragraf narasi deskriptif yang menjelaskan capaian nyata di lapangan, antusiasme dan respons positif dari warga/pihak yang dilayani, ketepatan penyelesaian target 100%, serta manfaat langsung kegiatan bagi kelancaran operasional "${unitKerja}".
+- D. SIMPULAN DAN SARAN:
+  * Kesimpulan: 2 paragraf narasi evaluasi menyeluruh atas kelancaran pelaksanaan tugas di lapangan, dinamika yang berhasil diatasi, dan komitmen pelayanan yang telah diwujudkan.
+  * Saran: 2 paragraf narasi berkesinambungan (tanpa angka 1, 2, 3) yang memuat usulan praktis, langkah tindak lanjut lapangan, dan penguatan koordinasi untuk kegiatan mendatang.
+- E. PENUTUP:
+  * 2 paragraf narasi penutup laporan pertanggungjawaban petugas lapangan dengan harapan agar laporan ini menjadi bahan evaluasi dan perbaikan program ke depan.
 
-Return exactly a JSON object conforming to this schema (do not wrap in markdown tags other than the raw JSON output):
+Nama Petugas: ${nama || "(Belum Diatur)"}
+NIP: ${nip || "(Belum Diatur)"}
+Unit Kerja: ${unitKerja || "(Belum Diatur)"}
+Target Periode: ${targetWaktu || "Periode Berjalan"}
+
+Keluarkan HANYA objek JSON sesuai skema berikut tanpa tanda markdown lain:
 {
   "pendahuluan": {
-    "umum": "Latar belakang umum yang mendalam dan kontekstual (3-4 paragraf panjang) terkait tugas jabatan ini dalam mendukung pembangunan instansi nasional.",
-    "maksudDanTujuan": "Penjelasan rinci maksud penyusunan laporan dan poin-poin tujuan pencapaian indikator kinerja individu secara terperinci.",
-    "ruangLingkup": "Batasan serta cakupan kegiatan yang dilaporkan secara detail (wilayah, target, waktu, dan administrasi).",
-    "dasar": "Daftar lengkap dasar hukum dan peraturan perundang-undangan (UU ASN, Permenpan, Permensos, SK, Surat Tugas, dll) yang relevan dan mendasari penugasan."
+    "umum": "Paragraf-paragraf narasi mengalir tentang latar belakang tugas lapangan tanpa poin-poin.",
+    "maksudDanTujuan": "Paragraf narasi mengalir tentang maksud dan tujuan kegiatan lapangan tanpa penomoran.",
+    "ruangLingkup": "Paragraf narasi mengalir tentang batasan wilayah, sasaran, dan waktu tanpa butir daftar.",
+    "dasar": "Paragraf narasi mengalir yang memuat dasar penugasan kedinasan secara deskriptif."
   },
-  "kegiatanLaksana": "Deskripsi sangat rinci dan kronologis (4-5 paragraf) mengenai proses pelaksanaan kegiatan sehari-hari dari persiapan, eksekusi lapangan, hingga mitigasi kendala.",
-  "hasilDicapai": "Uraian mendalam mengenai kuantitas, kualitas, serta dampak nyata (output & outcome) dari hasil kerja keras yang telah dicapai, diselaraskan dengan sasaran unit kerja.",
+  "kegiatanLaksana": "Paragraf-paragraf narasi kronologis mendalam yang menceritakan detail proses kegiatan petugas di lapangan tanpa poin/bullet.",
+  "hasilDicapai": "Paragraf-paragraf narasi capaian nyata, respons warga, dan ketercapaian target di lapangan tanpa format list.",
   "simpulanDanSaran": {
-    "kesimpulan": "Deskripsi penarikan kesimpulan analitis mendalam mengenai tingkat keberhasilan pencapaian target kerja.",
-    "saran": "Rekomendasi taktis dan konstruktif (3-5 poin konkret) untuk perbaikan berkelanjutan pelaksanaan kegiatan di masa mendatang."
+    "kesimpulan": "Paragraf narasi kesimpulan evaluasi pelaksanaan tugas lapangan.",
+    "saran": "Paragraf narasi saran dan tindak lanjut perbaikan ke depan dalam bentuk narasi mengalir tanpa angka/poin."
   },
-  "penutup": "Pernyataan penutup formal kedinasan (2 paragraf) serta komitmen berkelanjutan atas tugas yang diamanahkan."
+  "penutup": "Paragraf narasi penutup laporan pertanggungjawaban petugas lapangan."
 }
 `;
 
@@ -215,22 +218,25 @@ app.post("/api/report/polish", async (req, res) => {
     const ai = getGeminiClient();
 
     const prompt = `
-Anda adalah asisten admin ASN (Aparatur Sipil Negara) yang sangat ahli dalam menyunting laporan birokrasi Indonesia.
-Tugas Anda adalah memperkeras, merapikan, dan menuangkan tata bahasa formal (Bahasa Indonesia Baku/PUEBI) ke bagian laporan "${sectionTitle}" saat ini.
+Anda adalah penyunting laporan operasional lapangan ASN/petugas pelayanan publik di Indonesia.
+Tugas Anda adalah memoles dan memperluas narasi pada bagian "${sectionTitle}" agar menjadi narasi laporan petugas lapangan yang hidup, mengalir, deskriptif, tidak kaku/tidak teoritis berlebihan, namun tetap tertib dan profesional.
 
-Informasi Pekerjaan:
-- Jabatan: ${jabatan || "Pegawai ASN"}
+Informasi Jabatan:
+- Jabatan: ${jabatan || "Petugas Lapangan"}
 - Rencana Hasil Kerja (RHK) Utama: ${rhkUtama || "Kinerja Utama"}
 
-Instruksi Tambahan dari Pengguna: "${instruction || "Membuat kalimat lebih formal, terstruktur, kaya akan penjelasan akademis dan profesional"}"
+Instruksi Tambahan dari Pengguna: "${instruction || "Perluas narasi gaya bahasa laporan petugas lapangan, deskripsikan proses dan dinamika secara mengalir, dan pastikan dalam bentuk paragraf narasi tanpa poin-poin/angka"}"
 
 Konten Saat Ini:
 """
 ${currentContent}
 """
 
-Tulis ulang bagian tersebut agar sangat elegan, kaya informasi, dan rapi sesuai struktur serta standar instansi pemerintah RI. 
-PENTING: Hanya keluarkan teks hasil revisi akhir saja tanpa pengantar, tanpa penutup, tanpa tambahan komentar/pesan, dan tanpa tanda petik pembuka/penutup.
+ATURAN UTAMA:
+1. Tuliskan dalam bentuk PARAGRAF NARASI yang mengalir rapi.
+2. DILARANG KERAS menggunakan poin-poin berbutir, simbol (-), bullet (•), maupun penomoran angka/huruf (1., 2., a., b.).
+3. Gunakan gaya bahasa naratif petugas lapangan yang natural, komunikatif, dan menggambarkan pelaksanaan tugas secara jelas.
+4. HANYA keluarkan teks hasil revisi akhir saja tanpa pengantar, tanpa penutup, tanpa tambahan komentar/pesan, dan tanpa tanda petik pembuka/penutup.
 `;
 
     const response = await ai.models.generateContent({

@@ -96,26 +96,26 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
         </div>
 
         {/* A. PENDAHULUAN */}
-        <div className="mb-6">
+        <div className="mb-6" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
           <h3 className="text-[12pt] font-bold text-black uppercase mb-3">A. PENDAHULUAN</h3>
           
           <div className="space-y-4 text-justify pl-4">
-            <div>
+            <div style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
               <p className="font-bold mb-1">1. Umum</p>
               <p className="whitespace-pre-line text-gray-800 leading-relaxed font-normal">{data.pendahuluan.umum || "-"}</p>
             </div>
             
-            <div>
+            <div style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
               <p className="font-bold mb-1">2. Maksud dan Tujuan</p>
               <p className="whitespace-pre-line text-gray-800 leading-relaxed font-normal">{data.pendahuluan.maksudDanTujuan || "-"}</p>
             </div>
             
-            <div>
+            <div style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
               <p className="font-bold mb-1">3. Ruang Lingkup</p>
               <p className="whitespace-pre-line text-gray-800 leading-relaxed font-normal">{data.pendahuluan.ruangLingkup || "-"}</p>
             </div>
             
-            <div>
+            <div style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
               <p className="font-bold mb-1">4. Dasar</p>
               <p className="whitespace-pre-line text-gray-800 leading-relaxed font-normal mb-2">{data.pendahuluan.dasar || "-"}</p>
             </div>
@@ -123,7 +123,7 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
         </div>
 
         {/* B. KEGIATAN YANG DILAKSANAKAN */}
-        <div className="mb-6">
+        <div className="mb-6" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
           <h3 className="text-[12pt] font-bold text-black uppercase mb-2">B. KEGIATAN YANG DILAKSANAKAN</h3>
           <div className="pl-4 text-justify">
             <p className="whitespace-pre-line text-gray-800 leading-relaxed font-normal">{data.kegiatanLaksana || "-"}</p>
@@ -131,7 +131,7 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
         </div>
 
         {/* C. HASIL YANG DICAPAI */}
-        <div className="mb-6">
+        <div className="mb-6" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
           <h3 className="text-[12pt] font-bold text-black uppercase mb-2">C. HASIL YANG DICAPAI</h3>
           <div className="pl-4 text-justify">
             <p className="whitespace-pre-line text-gray-800 leading-relaxed font-normal">{data.hasilDicapai || "-"}</p>
@@ -139,16 +139,16 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
         </div>
 
         {/* D. SIMPULAN DAN SARAN */}
-        <div className="mb-6">
+        <div className="mb-6" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
           <h3 className="text-[12pt] font-bold text-black uppercase mb-3">D. SIMPULAN DAN SARAN</h3>
           
           <div className="space-y-4 text-justify pl-4">
-            <div>
+            <div style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
               <p className="font-bold mb-1">1. Kesimpulan</p>
               <p className="whitespace-pre-line text-gray-800 leading-relaxed font-normal">{data.simpulanDanSaran.kesimpulan || "-"}</p>
             </div>
             
-            <div>
+            <div style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
               <p className="font-bold mb-1">2. Saran</p>
               <p className="whitespace-pre-line text-gray-800 leading-relaxed font-normal">{data.simpulanDanSaran.saran || "-"}</p>
             </div>
@@ -156,7 +156,7 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
         </div>
 
         {/* E. PENUTUP */}
-        <div className="mb-8">
+        <div className="mb-8" style={{ breakInside: "avoid", pageBreakInside: "avoid" }}>
           <h3 className="text-[12pt] font-bold text-black uppercase mb-2">E. PENUTUP</h3>
           <div className="pl-4 text-justify">
             <p className="whitespace-pre-line text-gray-800 leading-relaxed font-normal">{data.penutup || "-"}</p>

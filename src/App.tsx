@@ -258,84 +258,59 @@ export default function App() {
       setTimeout(() => {
         const isKemensos = inputs.kopTipe === "kemensos" || (inputs.jabatan && inputs.jabatan.toLowerCase().includes("pkh"));
         
+        const cleanRingkasan = inputs.ringkasanKegiatan
+          .split("\n")
+          .map((line: string) => line.trim().replace(/^[-*•\d+.\s]+/, "").trim())
+          .filter(Boolean)
+          .join(". ");
+
         const fallbackReport: ReportData = {
           ...inputs,
           pendahuluan: {
-            umum: `Dalam kerangka tata kelola pemerintahan yang baik (good governance) dan akselerasi reformasi birokrasi, peningkatan kinerja aparatur sipil negara menjadi pilar fundamental dalam menjamin mutu serta kesinambungan pelayanan publik. Sebagai pejabat fungsional ${inputs.jabatan || "Aparatur Sipil Negara"} di lingkungan ${inputs.unitKerja || "instansi pemerintah"}, perwujudan akuntabilitas kinerja individu harus senantiasa terhubung langsung dengan target strategis organisasi, khususnya dalam merealisasikan Rencana Hasil Kerja (RHK) utama: "${inputs.rhkUtama}".
+            umum: `Kegiatan pelayanan dan pendampingan masyarakat di lapangan merupakan bagian penting dari pelaksanaan tugas sehari-hari sebagai ${inputs.jabatan || "petugas lapangan"} di lingkungan ${inputs.unitKerja || "unit kerja"}. Agar program kerja yang telah direncanakan dapat dirasakan manfaatnya secara langsung oleh masyarakat, pelaksanaan di lapangan harus dijalankan dengan penuh tanggung jawab, ketelitian, dan pendekatan komunikasi yang ramah serta terbuka.
 
-${isKemensos 
-  ? `Penyelenggaraan program perlindungan dan jaminan sosial nasional menuntut ketepatan sasaran, keterpaduan data, serta responsivitas tinggi dari para pendamping di garis terdepan. Dinamika di lapangan mengharuskan pelaksanaan kegiatan '${inputs.rencanaAksi}' dijalankan dengan disiplin tinggi, integritas tanpa kompromi, dan komitmen pelayanan prima demi menjamin hak-hak sosial Keluarga Penerima Manfaat (KPM) terlindungi secara optimal.`
-  : `Pelaksanaan tugas kedinasan pada unit ${inputs.unitKerja || "pelayanan"} menuntut efisiensi operasional, ketepatan metode kerja, dan sinergi lintas fungsi. Penyelenggaraan Rencana Aksi '${inputs.rencanaAksi}' merupakan langkah konkret dalam menjawab tantangan pelayanan publik dan mendukung pencapaian indikator kinerja utama instansi.`}
+Melalui pelaksanaan Rencana Hasil Kerja utama "${inputs.rhkUtama}", petugas hadir secara langsung di lokasi untuk memastikan setiap tahapan kegiatan '${inputs.rencanaAksi}' dapat berjalan dengan lancar, tertib, dan sesuai dengan petunjuk teknis yang berlaku.
 
-Laporan ini disusun sebagai dokumen pertanggungjawaban komprehensif atas pelaksanaan tugas kedinasan yang telah diselesaikan. Melalui laporan ini, seluruh rangkaian aktivitas, metodologi pelaksanaan, kendala yang dihadapi, hingga capaian keluaran (output) dan manfaat (outcome) didokumentasikan secara transparan, sistematis, dan akuntabel sesuai dengan Core Values ASN BerAKHLAK.`,
+Laporan ini disusun sebagai bentuk pertanggungjawaban riil atas apa yang telah dilaksanakan, diamati, dan dihadapi langsung oleh petugas di lapangan. Seluruh catatan alur kegiatan, dialog interaktif bersama warga, serta hasil capaian yang diperoleh disajikan secara transparan dan terperinci dalam laporan ini.`,
             
-            maksudDanTujuan: `Penyusunan Laporan Pelaksanaan Rencana Hasil Kerja ini memiliki maksud dan tujuan kedinasan yang terukur, antara lain:
+            maksudDanTujuan: `Penyusunan laporan ini dimaksudkan untuk mendokumentasikan seluruh rangkaian kegiatan penugasan lapangan yang dilaksanakan pada ${inputs.waktuPelaksanaan} bertempat di ${inputs.tempatPelaksanaan}. Melalui laporan ini, pimpinan dan pihak terkait dapat memperoleh gambaran utuh mengenai proses kerja nyata, dinamika di lapangan, serta langkah solutif yang diambil petugas di lokasi kegiatan.
 
-1. Maksud:
-   a. Menyediakan dokumen pertanggungjawaban administratif dan substantif yang formal atas realisasi Rencana Aksi '${inputs.rencanaAksi}'.
-   b. Menyajikan rekapitulasi data faktual dan kronologi pelaksanaan kegiatan yang diselenggarakan pada ${inputs.waktuPelaksanaan} bertempat di ${inputs.tempatPelaksanaan}.
-   c. Menjadi media transparansi dan akuntabilitas kinerja personal kepada pimpinan unit kerja dan Pejabat Penilai Kinerja.
-
-2. Tujuan:
-   a. Memastikan seluruh tahapan kegiatan berjalan sesuai dengan Standar Operasional Prosedur (SOP) dan regulasi yang berlaku.
-   b. Mengukur tingkat efektivitas dan efisiensi pelaksanaan tugas dalam mendukung target ${inputs.targetWaktu || "periode berjalan"}.
-   c. Mengidentifikasi faktor pendukung serta hambatan di lapangan guna merumuskan langkah perbaikan berkelanjutan.
-   d. Memberikan kontribusi nyata terhadap pencapaian sasaran unit kerja: ${inputs.peranInstansi || "Penunjang kelancaran tugas institusi"}.`,
+Tujuan utama dari kegiatan ini adalah memastikan terlaksananya '${inputs.rencanaAksi}' secara aman, tertib, dan memberikan manfaat langsung bagi ${inputs.pihakTerlibat}. Selain itu, kegiatan ini juga ditujukan untuk memperkuat koordinasi di tingkat lapangan, menjaring aspirasi warga, serta mendukung ketercapaian target kinerja ${inputs.peranInstansi || "pada unit kerja"}.`,
             
-            ruangLingkup: `Ruang lingkup pelaksanaan kegiatan dan penyusunan laporan ini dibatasi pada aspek-aspek kedinasan sebagai berikut:
+            ruangLingkup: `Ruang lingkup laporan ini mencakup seluruh tahapan penugasan lapangan yang dilaksanakan oleh petugas, mulai dari persiapan awal, pelaksanaan pendampingan dan koordinasi langsung, hingga evaluasi serta perapian data hasil kegiatan.
 
-1. Batasan Substantif dan Teknis: Meliputi serangkaian proses perencanaan, konsolidasi instrumen kerja, pelaksanaan operasional lapangan dari Rencana Aksi '${inputs.rencanaAksi}', fasilitasi kendala teknis, serta verifikasi kelengkapan bukti dukung (evidence).
-2. Batasan Kewilayahan dan Sasaran: Dilaksanakan secara terfokus pada lokus kerja bertempat di ${inputs.tempatPelaksanaan}, dengan melibatkan secara aktif ${inputs.pihakTerlibat}.
-3. Batasan Waktu: Pelaksanaan kegiatan diselenggarakan sepenuhnya pada rentang waktu ${inputs.waktuPelaksanaan} dalam periode penilaian target ${inputs.targetWaktu || "berjalan"}.`,
+Wilayah pelaksanaan kegiatan dipusatkan di ${inputs.tempatPelaksanaan} dengan sasaran pihak yang terlibat meliputi ${inputs.pihakTerlibat}. Seluruh rangkaian kegiatan ini dilaksanakan pada rentang waktu ${inputs.waktuPelaksanaan} dalam rangka pemenuhan target kinerja ${inputs.targetWaktu || "periode berjalan"}.`,
             
             dasar: inputs.hasSuratTugas
-              ? `1. Surat Tugas dari ${inputs.suratTugasPemberi || "Pejabat Pembina Kepegawaian"} Nomor: ${inputs.suratTugasNomor || "-"} tanggal ${inputs.suratTugasTanggal || "-"} perihal ${inputs.suratTugasPerihal || "-"}.\n2. Undang-Undang Republik Indonesia Nomor 20 Tahun 2023 tentang Aparatur Sipil Negara.\n3. Undang-Undang Republik Indonesia Nomor 11 Tahun 2009 tentang Kesejahteraan Sosial.\n4. Peraturan Menteri Pendayagunaan Aparatur Negara dan Reformasi Birokrasi Nomor 6 Tahun 2022 tentang Pengelolaan Kinerja Pegawai Aparatur Sipil Negara.\n5. Peraturan Menteri Sosial Republik Indonesia terkait Petunjuk Teknis Pelaksanaan Program Jaminan Sosial.\n6. Sasaran Kinerja Pegawai (SKP) pada unit kerja ${inputs.unitKerja || "instansi"}.`
-              : `1. Undang-Undang Republik Indonesia Nomor 20 Tahun 2023 tentang Aparatur Sipil Negara.\n2. Undang-Undang Republik Indonesia Nomor 11 Tahun 2009 tentang Kesejahteraan Sosial.\n3. Peraturan Menteri Pendayagunaan Aparatur Negara dan Reformasi Birokrasi Nomor 6 Tahun 2022 tentang Pengelolaan Kinerja Pegawai Aparatur Sipil Negara.\n4. Peraturan Menteri Sosial Republik Indonesia terkait Petunjuk Teknis Pelaksanaan Program Jaminan Sosial.\n5. Keputusan Direktur Jenderal Perlindungan dan Jaminan Sosial tentang Pedoman Operasional Program.\n6. Sasaran Kinerja Pegawai (SKP) pada unit kerja ${inputs.unitKerja || "instansi"}.`
+              ? `Pelaksanaan tugas operasional lapangan ini didasarkan pada penugasan resmi sesuai Surat Tugas dari ${inputs.suratTugasPemberi || "Pimpinan"} Nomor ${inputs.suratTugasNomor || "-"} tanggal ${inputs.suratTugasTanggal || "-"} perihal ${inputs.suratTugasPerihal || "-"}, serta berpedoman pada peraturan perundang-undangan aparatur sipil negara dan sasaran kinerja pegawai pada ${inputs.unitKerja || "instansi"}.`
+              : `Pelaksanaan tugas operasional lapangan ini didasarkan pada penugasan kedinasan dalam rangka pemenuhan Sasaran Kinerja Pegawai (SKP) pada unit kerja ${inputs.unitKerja || "instansi"}, serta berpedoman pada peraturan perundang-undangan aparatur sipil negara dan petunjuk teknis pelaksanaan program yang berlaku.`
           },
           
-          kegiatanLaksana: `Pelaksanaan Rencana Hasil Kerja dengan Rencana Aksi "${inputs.rencanaAksi}" dilaksanakan secara bertahap, terstruktur, dan akuntabel melalui serangkaian tahapan operasional sebagai berikut:
+          kegiatanLaksana: `Pelaksanaan kegiatan dimulai dengan persiapan perlengkapan administrasi dan instrumen pendukung sebelum petugas berangkat ke lokasi tugas. Setibanya di ${inputs.tempatPelaksanaan} pada ${inputs.waktuPelaksanaan}, petugas langsung menemui dan berkoordinasi dengan ${inputs.pihakTerlibat} untuk menyelaraskan alur kegiatan agar seluruh tahapan dapat berlangsung tertib dan teratur.
 
-1. Tahap Persiapan dan Koordinasi Awal:
-   Sebelum turun ke lokasi pelaksanaan di ${inputs.tempatPelaksanaan}, pelapor melakukan penyiapan data awal, penyusunan daftar periksa (checklist), serta koordinasi teknis bersama unsur-unsur terkait (${inputs.pihakTerlibat}). Hal ini dilakukan guna memastikan kesiapan instrumen kerja, kejelasan pembagian tugas, dan meminimalkan potensi kendala teknis saat pelaksanaan di lapangan.
+Selanjutnya, petugas melaksanakan agenda utama secara langsung di lapangan. Dalam prosesnya, petugas melakukan rangkaian tindakan nyata, antara lain ${cleanRingkasan ? cleanRingkasan + "." : "melakukan pendampingan teknis dan verifikasi data faktual secara langsung."} Setiap tahapan diarahkan dengan penjelasan yang jelas dan mudah dipahami, sehingga warga maupun pihak terkait merasa nyaman dalam berinteraksi.
 
-2. Tahap Pelaksanaan Operasional Lapangan:
-   Pada ${inputs.waktuPelaksanaan}, pelapor melaksanakan rangkaian tugas kedinasan secara langsung di ${inputs.tempatPelaksanaan}. Adapun rincian fakta kegiatan yang dilaksanakan mencakup:
-${inputs.ringkasanKegiatan.split('\n').map((line: string) => line.trim().startsWith('-') ? `   ${line}` : `   - ${line}`).join('\n')}
-
-3. Tahap Interaksi dan Komunikasi Sektoral:
-   Sepanjang kegiatan, pelapor membangun komunikasi yang harmonis dan kolaboratif bersama ${inputs.pihakTerlibat}. Dialog interaktif, pendampingan persuasif, dan penjelasan administratif diberikan secara transparan untuk memastikan seluruh pihak memahami substansi dan regulasi yang berlaku.
-
-4. Tahap Pengendalian dan Penyelesaian Kendala:
-   Setiap kendala yang muncul di lapangan langsung diidentifikasi, diklarifikasi, dan dikoordinasikan solusinya dengan cepat dan tepat tanpa melanggar ketentuan hukum. Seluruh proses didokumentasikan dengan cermat sebagai bukti fisik (evidence) pendukung laporan kinerja.`,
+Selama kegiatan berlangsung, komunikasi dua arah dibangun secara terbuka dan bersahabat. Segala pertanyaan, masukan, maupun kendala administratif yang ditemui di lapangan langsung ditangani dan diberikan solusi di tempat. Petugas juga mendokumentasikan setiap momen penting sebagai bukti otentik pelaksanaan tugas. Seluruh rangkaian kegiatan selesai dengan aman, lancar, dan penuh kebersamaan.`,
           
-          hasilDicapai: `Berdasarkan seluruh rangkaian aktivitas fungsional yang telah dituntaskan di ${inputs.tempatPelaksanaan} pada ${inputs.waktuPelaksanaan}, hasil-hasil konkret dan dampak strategis (output dan outcome) yang berhasil dicapai adalah sebagai berikut:
+          hasilDicapai: `Pelaksanaan kegiatan di ${inputs.tempatPelaksanaan} pada ${inputs.waktuPelaksanaan} telah membuahkan hasil yang memuaskan dan mencapai seluruh target yang diharapkan. Seluruh agenda dalam rencana aksi terlaksana seratus persen tepat waktu, dan warga maupun pihak yang terlibat (${inputs.pihakTerlibat}) dapat mengikuti seluruh tahapan dengan tertib dan lancar.
 
-1. Capaian Kuantitatif:
-   a. Seluruh target volume kerja dari Rencana Aksi '${inputs.rencanaAksi}' terealisasi 100% tepat waktu sesuai dengan jadwal yang telah ditetapkan.
-   b. Partisipasi dan kehadiran dari unsur yang terlibat (${inputs.pihakTerlibat}) berjalan optimal dengan tingkat keikutsertaan yang sangat tinggi dan tertib administrasi.
-   c. Berhasil menghimpun dan memverifikasi kelengkapan dokumen pendukung (evidence), berkas administrasi, dan dokumentasi foto kegiatan secara lengkap.
+Dari segi pelayanan dan interaksi sosial, kehadiran petugas disambut dengan sangat baik dan terbuka oleh masyarakat setempat. Warga merasa terbantu dengan adanya pendampingan langsung, penjelasan yang gamblang, serta kemudahan dalam menyelesaikan urusan yang berkaitan dengan program.
 
-2. Capaian Kualitatif:
-   a. Terwujudnya pemahaman yang utuh, kesadaran tertib aturan, dan peningkatan kepuasan dari seluruh pihak/masyarakat yang dilayani.
-   b. Proses pelaksanaan berjalan dengan aman, lancar, transparan, dan bebas dari segala bentuk penyimpangan maupun pungutan liar.
-   c. Terjaganya integritas data dan ketaatan penuh terhadap Standar Operasional Prosedur (SOP) kedinasan.
-
-3. Kontribusi terhadap Sasaran Kinerja Organisasi:
-   Capaian ini memberikan kontribusi langsung dan nyata terhadap kinerja ${inputs.unitKerja || "unit kerja"}, yakni: ${inputs.peranInstansi || "Mewujudkan pelayanan prima, transparansi data, dan akuntabilitas program nasional"}.`,
+Seluruh data administrasi, catatan hasil kunjungan, dan dokumentasi foto di lapangan telah berhasil dihimpun secara lengkap dan akurat. Hasil capaian ini secara nyata mendukung kelancaran operasional pada ${inputs.unitKerja || "unit kerja"} dan memperkuat mutu pelayanan publik yang diberikan.`,
           
           simpulanDanSaran: {
-            kesimpulan: `1. Pelaksanaan Rencana Hasil Kerja (RHK) jabatan ${inputs.jabatan} melalui Rencana Aksi "${inputs.rencanaAksi}" pada ${inputs.waktuPelaksanaan} di ${inputs.tempatPelaksanaan} telah terlaksana dengan sangat baik, lancar, dan mencapai 100% dari target yang direncanakan.
+            kesimpulan: `Secara keseluruhan, pelaksanaan tugas lapangan untuk Rencana Aksi "${inputs.rencanaAksi}" di ${inputs.tempatPelaksanaan} telah berjalan dengan aman, tertib, dan berhasil mencapai tujuan yang telah ditetapkan. Pendekatan persuasif dan komunikasi yang baik dengan ${inputs.pihakTerlibat} menjadi faktor utama kelancaran kegiatan di lapangan.
 
-2. Kolaborasi yang solid dan komunikasi yang harmonis bersama ${inputs.pihakTerlibat} menjadi faktor kunci keberhasilan pelaksanaan tugas, sekaligus membuktikan penerapan nyata nilai-nilai dasar ASN BerAKHLAK di lapangan.`,
+Kegiatan ini membuktikan pentingnya kehadiran petugas secara langsung di lokasi untuk memantau kondisi riil, mendengar kebutuhan warga, dan memastikan setiap kendala administratif maupun teknis dapat diselesaikan dengan cepat dan tepat.`,
             
-            saran: `1. Disarankan untuk terus mempertahankan dan meningkatkan intensitas koordinasi berkala bersama ${inputs.pihakTerlibat} guna memperkuat sinergi kerja di masa mendatang.
-2. Perlu dilakukan pemantauan berkelanjutan dan pemutakhiran data secara berkala agar kesinambungan hasil kegiatan tetap terjaga secara optimal.
-3. Mengoptimalkan pemanfaatan sarana teknologi digital dan sistem informasi kepegawaian dalam percepatan pelaporan serta pengarsipan dokumen evidence secara terpusat.`
+            saran: `Berdasarkan pengalaman dan pengamatan langsung selama bertugas di lapangan, disarankan agar komunikasi dan koordinasi berkala bersama ${inputs.pihakTerlibat} terus dipertahankan dan ditingkatkan agar pelaksanaan kegiatan serupa di masa mendatang dapat berjalan lebih efisien.
+
+Selain itu, diperlukan pemantauan dan pemutakhiran data secara berkelanjutan pasca kegiatan, serta penguatan sarana penunjang pendataan di lapangan agar pelayanan kepada masyarakat dapat terus ditingkatkan kualitasnya.`
           },
           
-          penutup: `Demikian Laporan Pelaksanaan Rencana Hasil Kerja ini disusun dengan sebenar-benarnya berdasarkan fakta dan kondisi riil di lapangan, sebagai wujud transparansi, loyalitas, dan akuntabilitas kinerja personal.
+          penutup: `Demikian laporan kegiatan lapangan ini kami susun dengan sebenarnya berdasarkan pengamatan, interaksi, dan fakta riil yang terjadi di lokasi penugasan.
 
-Besar harapan kami laporan ini dapat memberikan gambaran yang jelas mengenai capaian target kerja yang telah dilaksanakan, serta dapat dijadikan bahan evaluasi, telaah, dan pertimbangan bagi Pejabat Penilai Kinerja dalam rangka penyempurnaan pelaksanaan program di masa yang akan datang.`
+Semoga laporan ini dapat memberikan gambaran yang jelas mengenai proses serta hasil kerja petugas di lapangan, sekaligus menjadi bahan evaluasi dan masukan yang bermanfaat bagi penyempurnaan program kerja ke depan.`
         };
         setReport(fallbackReport);
         setStep("workspace");

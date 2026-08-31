@@ -10,7 +10,8 @@ import {
   WidthType, 
   BorderStyle, 
   PageBreak, 
-  ImageRun 
+  ImageRun,
+  UnderlineType
 } from "docx";
 import { ReportData, PhotoAttachment } from "../types";
 import { getReportFileName, formatJudulLaporan, extractFormalDateForSignature } from "./dateFormatter";
@@ -31,7 +32,7 @@ const KEMENSOS_SVG_RAW = `<?xml version="1.0" encoding="UTF-8"?>
 </g>
 </svg>`;
 
-// Helper to convert base64 image string to ArrayBuffer for docx ImageRun
+// Helper to convert base64 image string to ArrayBuffer
 async function base64ToArrayBuffer(base64: string): Promise<ArrayBuffer> {
   const base64Content = base64.split(",")[1] || base64;
   const binaryString = window.atob(base64Content);
@@ -45,7 +46,6 @@ async function base64ToArrayBuffer(base64: string): Promise<ArrayBuffer> {
 
 // Convert SVG text to high-res PNG ArrayBuffer with multiple bulletproof fallbacks
 async function renderSvgToPngArrayBuffer(svgString: string): Promise<ArrayBuffer | null> {
-  // Normalize SVG string to ensure standard pixel dimensions and clean viewBox
   const cleanSvg = svgString
     .replace(/width="[^"]*"/, 'width="455"')
     .replace(/height="[^"]*"/, 'height="510"')
@@ -92,7 +92,7 @@ async function renderSvgToPngArrayBuffer(svgString: string): Promise<ArrayBuffer
     });
   };
 
-  // Strategy 1: Clean Data URI (instant, no Blob lifecycle issues)
+  // Strategy 1: Clean Data URI
   const dataUri = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(cleanSvg)}`;
   let result = await loadAndDrawImage(dataUri);
   if (result && result.byteLength > 100) return result;
@@ -139,22 +139,6 @@ export async function exportToWord(data: ReportData, photos: PhotoAttachment[]):
     });
   };
 
-  const createSubtitle = (text: string) => {
-    return new Paragraph({
-      alignment: AlignmentType.CENTER,
-      spacing: { after: 360 },
-      children: [
-        new TextRun({
-          text,
-          bold: true,
-          font: "Arial",
-          size: 24, // 12pt
-          color: "333333"
-        })
-      ]
-    });
-  };
-
   const createHeading1 = (code: string, text: string) => {
     return new Paragraph({
       spacing: { before: 360, after: 120 },
@@ -174,7 +158,7 @@ export async function exportToWord(data: ReportData, photos: PhotoAttachment[]):
   const createHeading2 = (code: string, text: string) => {
     return new Paragraph({
       spacing: { before: 200, after: 80 },
-      indent: { left: 360 }, // indent 0.25" (approx 360 twips)
+      indent: { left: 360 }, // indent 0.25"
       keepNext: true,
       children: [
         new TextRun({
@@ -188,18 +172,36 @@ export async function exportToWord(data: ReportData, photos: PhotoAttachment[]):
     });
   };
 
-  const createBodyParagraph = (text: string, isIndented = false) => {
-    return new Paragraph({
-      alignment: AlignmentType.JUSTIFIED,
-      spacing: { before: 100, after: 120, line: 360 },
-      indent: isIndented ? { left: 720 } : undefined, // double indent for level 2 children
-      children: [
-        new TextRun({
-          text,
-          font: "Arial",
-          size: 22, // 11pt
+  const createBodyParagraphs = (text: string, isIndented = false): Paragraph[] => {
+    if (!text || !text.trim()) {
+      return [
+        new Paragraph({
+          alignment: AlignmentType.JUSTIFIED,
+          spacing: { before: 100, after: 120, line: 360 },
+          indent: isIndented ? { left: 720 } : undefined,
+          children: [new TextRun({ text: "-", font: "Arial", size: 22 })]
         })
-      ]
+      ];
+    }
+
+    const paragraphs = text
+      .split(/\n+/)
+      .map(p => p.trim())
+      .filter(Boolean);
+
+    return paragraphs.map(p => {
+      return new Paragraph({
+        alignment: AlignmentType.JUSTIFIED,
+        spacing: { before: 100, after: 140, line: 360 },
+        indent: isIndented ? { left: 720 } : undefined,
+        children: [
+          new TextRun({
+            text: p,
+            font: "Arial",
+            size: 22, // 11pt
+          })
+        ]
+      });
     });
   };
 
@@ -329,12 +331,13 @@ export async function exportToWord(data: ReportData, photos: PhotoAttachment[]):
                     spacing: { before: 0, after: 0 },
                     children: [
                       new ImageRun({
-                        data: logoPngBuffer,
+                        data: new Uint8Array(logoPngBuffer),
                         transformation: {
                           width: 72,
                           height: 80,
                         },
-                      } as any),
+                        type: "png",
+                      }),
                     ],
                   }),
                 ],
@@ -358,9 +361,10 @@ export async function exportToWord(data: ReportData, photos: PhotoAttachment[]):
     docChildren.push(
       new Paragraph({
         border: {
-          bottom: { color: "000000", space: 4, style: BorderStyle.DOUBLE, size: 24 } // DOUBLE thick line
+          bottom: { color: "000000", space: 4, style: BorderStyle.DOUBLE, size: 24 }
         },
-        spacing: { before: 80, after: 300 }
+        spacing: { before: 80, after: 300 },
+        children: [new TextRun("")]
       })
     );
   }
@@ -421,47 +425,111 @@ export async function exportToWord(data: ReportData, photos: PhotoAttachment[]):
   
   // A.1 Umum
   docChildren.push(createHeading2("1", "Umum"));
-  docChildren.push(createBodyParagraph(data.pendahuluan.umum, true));
+  docChildren.push(...createBodyParagraphs(data.pendahuluan.umum, true));
 
   // A.2 Maksud dan Tujuan
   docChildren.push(createHeading2("2", "Maksud dan Tujuan"));
-  docChildren.push(createBodyParagraph(data.pendahuluan.maksudDanTujuan, true));
+  docChildren.push(...createBodyParagraphs(data.pendahuluan.maksudDanTujuan, true));
 
   // A.3 Ruang Lingkup
   docChildren.push(createHeading2("3", "Ruang Lingkup"));
-  docChildren.push(createBodyParagraph(data.pendahuluan.ruangLingkup, true));
+  docChildren.push(...createBodyParagraphs(data.pendahuluan.ruangLingkup, true));
 
   // A.4 Dasar
   docChildren.push(createHeading2("4", "Dasar"));
-  docChildren.push(createBodyParagraph(data.pendahuluan.dasar, true));
+  docChildren.push(...createBodyParagraphs(data.pendahuluan.dasar, true));
 
   // B. KEGIATAN YANG DILAKSANAKAN
   docChildren.push(createHeading1("B", "KEGIATAN YANG DILAKSANAKAN"));
-  docChildren.push(createBodyParagraph(data.kegiatanLaksana));
+  docChildren.push(...createBodyParagraphs(data.kegiatanLaksana));
 
   // C. HASIL YANG DICAPAI
   docChildren.push(createHeading1("C", "HASIL YANG DICAPAI"));
-  docChildren.push(createBodyParagraph(data.hasilDicapai));
+  docChildren.push(...createBodyParagraphs(data.hasilDicapai));
 
   // D. SIMPULAN DAN SARAN
   docChildren.push(createHeading1("D", "SIMPULAN DAN SARAN"));
 
   // D.1 Kesimpulan
   docChildren.push(createHeading2("1", "Kesimpulan"));
-  docChildren.push(createBodyParagraph(data.simpulanDanSaran.kesimpulan, true));
+  docChildren.push(...createBodyParagraphs(data.simpulanDanSaran.kesimpulan, true));
 
   // D.2 Saran
   docChildren.push(createHeading2("2", "Saran"));
-  docChildren.push(createBodyParagraph(data.simpulanDanSaran.saran, true));
+  docChildren.push(...createBodyParagraphs(data.simpulanDanSaran.saran, true));
 
   // E. PENUTUP
   docChildren.push(createHeading1("E", "PENUTUP"));
-  docChildren.push(createBodyParagraph(data.penutup));
+  docChildren.push(...createBodyParagraphs(data.penutup));
 
   // Spacing before signature block
-  docChildren.push(new Paragraph({ spacing: { before: 400 } }));
+  docChildren.push(new Paragraph({ spacing: { before: 400 }, children: [new TextRun("")] }));
 
   // Signature Block Table (Table to align right side)
+  const cellChildren: Paragraph[] = [
+    new Paragraph({
+      alignment: AlignmentType.LEFT,
+      spacing: { after: 40 },
+      children: [
+        new TextRun({ 
+          text: `${data.tempatPembuatan || "Jakarta"}, ${extractFormalDateForSignature(data.waktuPelaksanaan, data.tanggalPembuatan)}`, 
+          font: "Arial", 
+          size: 22 
+        })
+      ]
+    }),
+    new Paragraph({
+      alignment: AlignmentType.LEFT,
+      spacing: { after: data.signatureData ? 80 : 1000 },
+      children: [new TextRun({ text: data.jabatan || "Pelapor", font: "Arial", size: 22, bold: true })]
+    })
+  ];
+
+  if (data.signatureData) {
+    try {
+      const sigBuffer = await base64ToArrayBuffer(data.signatureData);
+      const isPng = data.signatureData.startsWith("data:image/png");
+      cellChildren.push(
+        new Paragraph({
+          alignment: AlignmentType.LEFT,
+          spacing: { before: 40, after: 40 },
+          children: [
+            new ImageRun({
+              data: new Uint8Array(sigBuffer),
+              transformation: {
+                width: 140,
+                height: 55,
+              },
+              type: isPng ? "png" : "png",
+            }),
+          ],
+        })
+      );
+    } catch (err) {
+      console.error("Gagal menyisipkan ttd ke Word:", err);
+    }
+  }
+
+  cellChildren.push(
+    new Paragraph({
+      alignment: AlignmentType.LEFT,
+      spacing: { after: 20 },
+      children: [
+        new TextRun({ 
+          text: data.nama || "-", 
+          font: "Arial", 
+          size: 22, 
+          bold: true, 
+          underline: { type: UnderlineType.SINGLE } 
+        })
+      ]
+    }),
+    new Paragraph({
+      alignment: AlignmentType.LEFT,
+      children: [new TextRun({ text: `NIP. ${data.nip || "-"}`, font: "Arial", size: 22 })]
+    })
+  );
+
   docChildren.push(
     new Table({
       width: { size: 100, type: WidthType.PERCENTAGE },
@@ -478,61 +546,11 @@ export async function exportToWord(data: ReportData, photos: PhotoAttachment[]):
           children: [
             new TableCell({
               width: { size: 55, type: WidthType.PERCENTAGE },
-              children: [new Paragraph({ text: "" })] // left side empty
+              children: [new Paragraph({ children: [new TextRun("")] })]
             }),
             new TableCell({
               width: { size: 45, type: WidthType.PERCENTAGE },
-              children: await (async () => {
-                const cellChildren: any[] = [
-                  new Paragraph({
-                    alignment: AlignmentType.LEFT,
-                    spacing: { after: 40 },
-                    children: [new TextRun({ text: `${data.tempatPembuatan || "Jakarta"}, ${extractFormalDateForSignature(data.waktuPelaksanaan, data.tanggalPembuatan)}`, font: "Arial", size: 22 })]
-                  }),
-                  new Paragraph({
-                    alignment: AlignmentType.LEFT,
-                    spacing: { after: data.signatureData ? 80 : 1000 },
-                    children: [new TextRun({ text: data.jabatan || "Pelapor", font: "Arial", size: 22, bold: true })]
-                  })
-                ];
-
-                if (data.signatureData) {
-                  try {
-                    const sigBuffer = await base64ToArrayBuffer(data.signatureData);
-                    cellChildren.push(
-                      new Paragraph({
-                        alignment: AlignmentType.LEFT,
-                        spacing: { before: 40, after: 40 },
-                        children: [
-                          new ImageRun({
-                            data: sigBuffer,
-                            transformation: {
-                              width: 140,
-                              height: 55,
-                            },
-                          } as any),
-                        ],
-                      })
-                    );
-                  } catch (err) {
-                    console.error("Gagal menyisipkan ttd ke Word:", err);
-                  }
-                }
-
-                cellChildren.push(
-                  new Paragraph({
-                    alignment: AlignmentType.LEFT,
-                    spacing: { after: 20 },
-                    children: [new TextRun({ text: data.nama || "-", font: "Arial", size: 22, bold: true, underline: {} })]
-                  }),
-                  new Paragraph({
-                    alignment: AlignmentType.LEFT,
-                    children: [new TextRun({ text: `NIP. ${data.nip || "-"}`, font: "Arial", size: 22 })]
-                  })
-                );
-
-                return cellChildren;
-              })()
+              children: cellChildren,
             })
           ]
         })
@@ -549,6 +567,8 @@ export async function exportToWord(data: ReportData, photos: PhotoAttachment[]):
     for (const photo of photos) {
       try {
         const imageBuffer = await base64ToArrayBuffer(photo.base64Data);
+        const isPng = photo.base64Data.startsWith("data:image/png");
+        const imgType = isPng ? "png" : "jpg";
 
         docChildren.push(
           new Paragraph({
@@ -556,12 +576,13 @@ export async function exportToWord(data: ReportData, photos: PhotoAttachment[]):
             spacing: { before: 240, after: 100 },
             children: [
               new ImageRun({
-                data: imageBuffer,
+                data: new Uint8Array(imageBuffer),
                 transformation: {
-                  width: 480, // High-quality display scale
+                  width: 480,
                   height: 320,
                 },
-              } as any),
+                type: imgType as any,
+              }),
             ],
           })
         );
@@ -583,7 +604,6 @@ export async function exportToWord(data: ReportData, photos: PhotoAttachment[]):
         );
       } catch (err) {
         console.error("Failed to inject image into Docx:", err, photo.fileName);
-        // Fallback placeholder if image parsing fails
         docChildren.push(
           new Paragraph({
             alignment: AlignmentType.CENTER,
@@ -631,3 +651,4 @@ export async function exportToWord(data: ReportData, photos: PhotoAttachment[]):
   document.body.removeChild(trigger);
   URL.revokeObjectURL(url);
 }
+

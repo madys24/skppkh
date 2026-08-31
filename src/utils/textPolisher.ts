@@ -1,6 +1,7 @@
 /**
- * Smart Indonesian Bureaucratic Text Polisher (PUEBI & Tata Naskah Dinas ASN).
+ * Smart Indonesian Field Officer Text Polisher & Narrative Expander.
  * Used as an ultra-resilient offline fallback when API is unreachable or deployed statically.
+ * Formats content into fluid, natural field officer narrative paragraphs without rigid bullet points.
  */
 export function polishTextOffline(
   currentText: string,
@@ -13,7 +14,7 @@ export function polishTextOffline(
 
   let text = currentText.trim();
 
-  // 1. Vocabulary formalization dictionary for Indonesian Civil Service
+  // 1. Natural field officer vocabulary polish (refined yet communicative and not overly stiff)
   const formalReplacements: Array<[RegExp, string]> = [
     [/\bbikin\b/gi, "menyusun"],
     [/\bngasih\b/gi, "memberikan"],
@@ -30,49 +31,58 @@ export function polishTextOffline(
     [/\bngerjakan\b/gi, "melaksanakan"],
     [/\bngurus\b/gi, "mengelola"],
     [/\bngurusin\b/gi, "mengkoordinasikan"],
-    [/\bketemu\b/gi, "melakukan koordinasi dengan"],
-    [/\bcek\b/gi, "melakukan verifikasi"],
-    [/\bngecek\b/gi, "memverifikasi dan memvalidasi"],
-    [/\bngeliat\b/gi, "memantau"],
+    [/\bketemu\b/gi, "berkoordinasi dan berdialog dengan"],
+    [/\bcek\b/gi, "melakukan pengecekan"],
+    [/\bngecek\b/gi, "memeriksa dan memverifikasi"],
+    [/\bngeliat\b/gi, "mengamati langsung"],
     [/\bliat\b/gi, "meninjau"],
-    [/\blaporan\s+oke\b/gi, "laporan telah diselesaikan secara akuntabel"],
-    [/\bhasilnya\s+bagus\b/gi, "capaian kinerja memenuhi indikator keberhasilan yang ditetapkan"],
-    [/\blancar\b/gi, "terlaksana secara tertib, lancar, dan kondusif"],
-    [/\bselesai\b/gi, "telah dituntaskan secara optimal"],
+    [/\blaporan\s+oke\b/gi, "laporan dan administrasi telah tersusun secara rapi"],
+    [/\bhasilnya\s+bagus\b/gi, "kegiatan berjalan dengan baik dan mencapai target"],
+    [/\blancar\b/gi, "terlaksana secara tertib, lancar, dan aman"],
+    [/\bselesai\b/gi, "telah dituntaskan dengan baik"],
   ];
 
   for (const [pattern, replacement] of formalReplacements) {
     text = text.replace(pattern, replacement);
   }
 
-  // 2. Ensure formal punctuation and spacing
+  // 2. Remove rigid bullet points / numbering markers and turn them into flowing narrative sentences
   text = text
-    .replace(/\s+/g, " ")
+    .split("\n")
+    .map((line) => {
+      let l = line.trim();
+      // Remove leading bullets or numbers like "1.", "a.", "-", "*", "•", "1)", "a)"
+      l = l.replace(/^(\d+[\.\)]|[a-zA-Z][\.\)]|[-*•–—])\s+/, "");
+      return l;
+    })
+    .filter((line) => line.length > 0)
+    .join("\n\n");
+
+  // 3. Ensure clean punctuation and spacing
+  text = text
+    .replace(/[ \t]+/g, " ")
     .replace(/\s+([,.:;?!])/g, "$1")
     .replace(/([,.:;?!])(?=[^\s\d])/g, "$1 ")
     .replace(/\.\s*\./g, ".")
     .trim();
 
-  // 3. Capitalize first letter of sentences
+  // 4. Capitalize first letter of sentences
   text = text.replace(/(^\s*|[.!?]\s+)([a-z])/g, (m, p1, p2) => p1 + p2.toUpperCase());
 
-  // 4. If specific user instruction was provided, enrich closing or context
+  // 5. If specific user instruction was provided, enrich or adapt
   if (instruction && instruction.trim()) {
     const cleanInst = instruction.trim().toLowerCase();
-    if (cleanInst.includes("formal") || cleanInst.includes("baku") || cleanInst.includes("resmi")) {
-      if (!text.includes("prinsip akuntabilitas") && !text.includes("BerAKHLAK")) {
-        text += `\n\nSeluruh rangkaian pelaksanaan tugas diselaraskan dengan tata kelola birokrasi yang transparan, akuntabel, dan berorientasi pada pelayanan prima sesuai core values ASN BerAKHLAK.`;
+    if (cleanInst.includes("lapangan") || cleanInst.includes("petugas") || cleanInst.includes("perluas")) {
+      if (!text.includes("langsung di lokasi")) {
+        text += `\n\nSeluruh rangkaian kegiatan terlaksana melalui interaksi langsung di lokasi penugasan dengan tetap mengedepankan pendekatan komunikatif dan keterbukaan bersama warga serta pihak terkait.`;
       }
-    } else if (cleanInst.includes("hasil") || cleanInst.includes("capaian") || cleanInst.includes("dampak")) {
-      if (!text.includes("output")) {
-        text += `\n\nCapaian kegiatan ini memberikan kontribusi nyata terhadap kelancaran operasional unit kerja dan terwujudnya tertib administrasi pelaporan.`;
+    } else if (cleanInst.includes("hasil") || cleanInst.includes("capaian")) {
+      if (!text.includes("capaian")) {
+        text += `\n\nCapaian positif ini memberikan manfaat nyata bagi masyarakat dan mendukung kelancaran operasional pelayanan di unit kerja.`;
       }
-    } else if (cleanInst.includes("singkat") || cleanInst.includes("padat") || cleanInst.includes("ringkas")) {
-      // already tightened
-    } else {
-      text += `\n\n(Catatan Tindak Lanjut: ${instruction.trim()})`;
     }
   }
 
   return text;
 }
+
