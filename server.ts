@@ -149,7 +149,7 @@ Return exactly a JSON object conforming to this schema (do not wrap in markdown 
 `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.7-flash",
       contents: prompt,
       config: {
         responseMimeType: "application/json",
@@ -228,7 +228,7 @@ PENTING: Hanya keluarkan teks hasil revisi akhir saja tanpa pengantar, tanpa pen
 `;
 
     const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-3.7-flash",
       contents: prompt,
       config: {
         temperature: 0.3,

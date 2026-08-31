@@ -237,40 +237,59 @@ export const A4Preview: React.FC<A4PreviewProps> = ({ data, photos }) => {
       {/* Embedded print stylesheet to handle actual browser print overrides */}
       <style>{`
         @media print {
-          /* Hide standard dashboard elements */
-          body {
-            background-color: white !important;
-            color: black !important;
+          html, body {
             margin: 0 !important;
             padding: 0 !important;
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            height: auto !important;
+            min-height: 100% !important;
+            overflow: visible !important;
           }
+          
+          /* Hide non-print dashboard elements */
           nav, footer, button, .no-print, header, aside, .floating-actions {
             display: none !important;
           }
-          /* Ensure the print container spans full width/height */
-          #root {
-            margin: 0 !important;
-            padding: 0 !important;
+          
+          /* Make sure ancestors don't clip */
+          #root, main, .overflow-y-auto, .overflow-x-auto, .sticky, div {
+            overflow: visible !important;
+            max-height: none !important;
+            height: auto !important;
+            position: static !important;
           }
+
+          body * {
+            visibility: hidden;
+          }
+
+          #print-area, #print-area * {
+            visibility: visible;
+          }
+
           #print-area {
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
-            width: 210mm !important;
-            min-height: 297mm !important;
+            width: 100% !important;
+            max-width: 100% !important;
             margin: 0 !important;
-            padding: 3cm 2.5cm 2.5cm 2.5cm !important; /* Perfect standard executive prints margins */
+            padding: 2.5cm 2.5cm 2.5cm 2.5cm !important;
             box-shadow: none !important;
             border: none !important;
-            background-color: white !important;
-            color: black !important;
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            font-family: 'Times New Roman', Times, serif !important;
+            font-size: 11pt !important;
+            line-height: 1.6 !important;
           }
-          /* Enforce explicit A4 page orientation and settings */
+
           @page {
             size: A4 portrait;
             margin: 0;
           }
-          /* Custom layout helpers */
+
           .page-break {
             page-break-before: always !important;
             break-before: page !important;

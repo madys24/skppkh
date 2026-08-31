@@ -1,3 +1,5 @@
+import { PKH_RHK_OPTIONS } from "../data/pkhOptions";
+
 /**
  * Formats a single date or date range beautifully into standard Indonesian formal text.
  * E.g., "Senin, 15 Juni 2026" or "Senin s.d. Rabu, 15 - 17 Juni 2026"
@@ -263,27 +265,89 @@ export function formatJudulLaporan(rencanaAksi?: string): string {
 }
 
 export function sanitizeRhkName(rhk?: string): string {
-  if (!rhk) return "RHK";
-  let clean = rhk
+  if (!rhk) return "RHK 1";
+  
+  const trimmed = rhk.trim();
+
+  // 1. Direct match with PKH options
+  for (const opt of PKH_RHK_OPTIONS) {
+    if (
+      opt.rhkUtama.toLowerCase() === trimmed.toLowerCase() ||
+      trimmed.toLowerCase().includes(opt.rhkUtama.substring(0, 30).toLowerCase()) ||
+      opt.label.toLowerCase().includes(trimmed.toLowerCase())
+    ) {
+      return `RHK ${opt.id}`;
+    }
+  }
+
+  // Check unique keywords from PKH RHKs
+  if (trimmed.includes("prinsip 6T") || trimmed.includes("Bantuan Sosial PKH secara berkala")) {
+    return "RHK 1";
+  }
+  if (trimmed.includes("P2K2") || trimmed.includes("Family Development Session")) {
+    return "RHK 2";
+  }
+  if (trimmed.includes("verifikasi komitmen") || trimmed.includes("pendidikan (sekolah) dan kesehatan")) {
+    return "RHK 3";
+  }
+  if (trimmed.includes("Graduasi") || trimmed.includes("PPSE")) {
+    return "RHK 4";
+  }
+  if (trimmed.includes("pemutakhiran data") || trimmed.includes("DTSEN") || trimmed.includes("verifikasi validasi")) {
+    return "RHK 5";
+  }
+  if (trimmed.includes("pengaduan") || trimmed.includes("Respon Kasus") || trimmed.includes("Kebencanaan")) {
+    return "RHK 6";
+  }
+  if (trimmed.includes("laporan bulanan") || trimmed.includes("kinerja Pendamping Sosial")) {
+    return "RHK 7";
+  }
+  if (trimmed.includes("rapat koordinasi") || trimmed.includes("TLHP") || trimmed.includes("Tugas Lainnya")) {
+    return "RHK 8";
+  }
+  if (trimmed.includes("media sosial") || trimmed.includes("publikasi edukasi") || trimmed.includes("Media Sosial")) {
+    return "RHK 9";
+  }
+
+  // 2. Check if string has explicit "RHK 1", "RHK 2", "RHK Utama 3", etc.
+  const rhkNumMatch = trimmed.match(/(?:RHK|rhk)\s*(?:Utama\s*)?(\d+)/i);
+  if (rhkNumMatch) {
+    return `RHK ${rhkNumMatch[1]}`;
+  }
+
+  // 3. If string starts with "RHK", extract short title
+  if (/^RHK/i.test(trimmed)) {
+    let cleanRhk = trimmed
+      .replace(/[/\\:*?"<>|\r\n]+/g, " ")
+      .split(/[:\-\–\—\n]/)[0]
+      .trim();
+    if (cleanRhk.length > 20) {
+      cleanRhk = cleanRhk.substring(0, 20).trim();
+    }
+    return cleanRhk || "RHK";
+  }
+
+  // 4. Custom RHK: sanitize and keep concise
+  let clean = trimmed
     .replace(/[/\\:*?"<>|\r\n]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
   
-  if (clean.length > 50) {
-    clean = clean.substring(0, 50).trim();
+  if (clean.length > 25) {
+    clean = clean.substring(0, 25).trim();
   }
-  return clean || "RHK";
+  return clean ? `RHK_${clean}` : "RHK 1";
 }
 
 export function sanitizeRencanaAksi(rencanaAksi?: string): string {
   const converted = convertRencanaAksiToPelaksanaan(rencanaAksi);
   let clean = converted
-    .replace(/[/\\:*?"<>|\r\n]+/g, " ")
+    .replace(/[/\\:*?"<>|,\r\n]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
   
-  if (clean.length > 70) {
-    clean = clean.substring(0, 70).trim();
+  if (clean.length > 80) {
+    clean = clean.substring(0, 80).trim();
   }
 
   return clean || "Pelaksanaan Rencana Aksi";

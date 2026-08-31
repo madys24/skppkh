@@ -27,6 +27,8 @@ import { A4Preview } from "./components/A4Preview";
 import { exportToWord } from "./utils/wordGenerator";
 import { ProfileSignatureCard } from "./components/ProfileSignatureCard";
 import { formatIndonesianDateRange, getReportFileName } from "./utils/dateFormatter";
+import { printReportDocument } from "./utils/printHelper";
+import { polishTextOffline } from "./utils/textPolisher";
 
 export default function App() {
   // Navigation / App State
@@ -280,6 +282,8 @@ export default function App() {
     setPolishingStatus((prev) => ({ ...prev, [sectionKey]: true }));
     const directive = polishInstructions[sectionKey] || "";
 
+    let revisedText = "";
+
     try {
       const response = await fetch("/api/report/polish", {
         method: "POST",
@@ -293,13 +297,19 @@ export default function App() {
         }),
       });
 
-      if (!response.ok) {
-        throw new Error("Gagal terhubung dengan server AI.");
+      if (response.ok) {
+        const data = await response.json();
+        revisedText = data.polishedText;
+      } else {
+        // Fallback to intelligent offline polisher
+        revisedText = polishTextOffline(currentText, sectionTitle, directive, report.jabatan, report.rhkUtama);
       }
+    } catch (err) {
+      // Fallback to intelligent offline polisher
+      revisedText = polishTextOffline(currentText, sectionTitle, directive, report.jabatan, report.rhkUtama);
+    }
 
-      const data = await response.json();
-      const revisedText = data.polishedText;
-
+    if (revisedText) {
       // Update nested state cleanly
       setReport((prev) => {
         if (!prev) return null;
@@ -326,12 +336,9 @@ export default function App() {
 
       // Clear the input directive text
       setPolishInstructions((prev) => ({ ...prev, [sectionKey]: "" }));
-
-    } catch (err) {
-      alert("Gagal melakukan pemolesan teks. Pastikan koneksi atau API siap.");
-    } finally {
-      setPolishingStatus((prev) => ({ ...prev, [sectionKey]: false }));
     }
+
+    setPolishingStatus((prev) => ({ ...prev, [sectionKey]: false }));
   };
 
   // Direct edit changes handler inside custom textareas
@@ -363,13 +370,7 @@ export default function App() {
   // Trigger A4 Native Print window
   const triggerNativePrint = () => {
     if (report) {
-      const originalTitle = document.title;
-      const pdfTitle = getReportFileName(report);
-      document.title = pdfTitle;
-      window.print();
-      setTimeout(() => {
-        document.title = originalTitle;
-      }, 1000);
+      printReportDocument(report, photos);
     } else {
       window.print();
     }
@@ -401,7 +402,7 @@ export default function App() {
               </button>
             )}
             <div className="bg-emerald-950 border border-emerald-800 rounded px-2.5 py-1 text-[10px] text-emerald-300 font-mono">
-              v1.2 // Powered by Gemini 3.5
+              v1.3 // Powered by Gemini 3.7 & Offline Engine
             </div>
           </div>
         </div>
