@@ -3,10 +3,10 @@ import { getReportFileName, formatJudulLaporan, extractFormalDateForSignature } 
 
 /**
  * Robust print helper that prints the A4 Report document cleanly into PDF or Paper
- * using an isolated, dedicated print frame. This guarantees:
- * 1. Zero blank pages caused by outer parent overflow/flexbox/transform constraints.
- * 2. Proper multi-page pagination (Page 1+: Report, Page N: Photo Attachments).
- * 3. Correct default PDF filename matching "ddmmyyyy_Nama RHK_Pelaksanaan [konversi Rencana aksi]".
+ * using an isolated, dedicated print frame with:
+ * 1. Proper multi-page margins (@page margin: 2.5cm).
+ * 2. Unbreakable paragraphs (break-inside: avoid) to prevent slicing words/lines in half.
+ * 3. Page numbering and photo attachments pagination.
  */
 export function printReportDocument(data: ReportData, photos: PhotoAttachment[] = []): void {
   const fileName = getReportFileName(data);
@@ -29,35 +29,48 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
       : [data.kopAlamat, data.kopTelepon ? `Telp. ${data.kopTelepon}` : "", data.kopWebsite].filter(Boolean).join(" ");
 
     const logoHtml = isKemensos
-      ? `<img src="/logo-kemensos.svg" alt="Logo Kemensos" style="width: 80px; height: 80px; object-fit: contain;" />`
-      : `<svg style="width: 75px; height: 75px;" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      ? `<img src="/logo-kemensos.svg" alt="Logo Kemensos" style="width: 75px; height: 75px; object-fit: contain;" />`
+      : `<svg style="width: 70px; height: 70px;" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M50 15 L20 30 L20 60 C 20 80, 50 90, 50 90 C 50 90, 80 80, 80 60 L80 30 Z" fill="#1e293b" />
           <path d="M50 20 L25 33 L25 58 C 25 75, 50 84, 50 84 C 50 84, 75 75, 75 58 L75 33 Z" fill="#f8fafc" />
           <polygon points="50,30 55,42 68,42 58,50 62,62 50,54 38,62 42,50 32,42 45,42" fill="#ca8a04" />
         </svg>`;
 
     kopHtml = `
-      <div style="display: flex; align-items: center; text-align: center; padding-bottom: 12px; border-bottom: 4px double #000; margin-bottom: 24px;">
+      <div style="display: flex; align-items: center; text-align: center; padding-bottom: 10px; border-bottom: 3.5px double #000; margin-bottom: 20px; page-break-after: avoid; break-after: avoid;">
         <div style="flex-shrink: 0; margin-right: 16px;">
           ${logoHtml}
         </div>
         <div style="flex-grow: 1; text-align: center; color: #000;">
-          <div style="font-size: 12pt; font-weight: bold; text-transform: uppercase; line-height: 1.2;">${kementerian}</div>
-          ${eselon1 ? `<div style="font-size: 11pt; font-weight: bold; text-transform: uppercase; line-height: 1.2; margin-top: 2px;">${eselon1}</div>` : ""}
-          ${eselon2 ? `<div style="font-size: 10pt; font-weight: bold; text-transform: uppercase; line-height: 1.2; margin-top: 2px;">${eselon2}</div>` : ""}
-          <div style="font-size: 8.5pt; line-height: 1.3; margin-top: 6px; font-family: Arial, sans-serif;">${kontak}</div>
+          <div style="font-size: 11.5pt; font-weight: bold; text-transform: uppercase; line-height: 1.2;">${kementerian}</div>
+          ${eselon1 ? `<div style="font-size: 10.5pt; font-weight: bold; text-transform: uppercase; line-height: 1.2; margin-top: 2px;">${eselon1}</div>` : ""}
+          ${eselon2 ? `<div style="font-size: 9.5pt; font-weight: bold; text-transform: uppercase; line-height: 1.2; margin-top: 2px;">${eselon2}</div>` : ""}
+          <div style="font-size: 8pt; line-height: 1.3; margin-top: 5px; font-family: Arial, sans-serif; color: #333;">${kontak}</div>
         </div>
       </div>
     `;
   }
 
+  // Helper to format text into discrete non-breakable paragraphs
+  const formatParagraphsHtml = (text: string, indent = true): string => {
+    if (!text || !text.trim()) return "<p class='text-paragraph'>-</p>";
+    return text
+      .split(/\n+/)
+      .map((p) => p.trim())
+      .filter(Boolean)
+      .map(
+        (p) => `<p class="text-paragraph" style="${indent ? 'text-indent: 28px;' : ''}">${p}</p>`
+      )
+      .join("");
+  };
+
   // Build Photo Attachments HTML
   let photosHtml = "";
   if (photos && photos.length > 0) {
     const photosItems = photos.map((p, idx) => `
-      <div style="page-break-inside: avoid; break-inside: avoid; text-align: center; margin-bottom: 24px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; background-color: #f8fafc;">
-        <img src="${p.base64Data}" alt="${p.caption || p.fileName}" style="max-height: 320px; max-width: 95%; object-fit: contain; border-radius: 4px; background: #fff;" />
-        <div style="margin-top: 10px; font-size: 10pt; font-style: italic; font-family: Arial, sans-serif; color: #334155;">
+      <div style="page-break-inside: avoid; break-inside: avoid; text-align: center; margin-bottom: 24px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; background-color: #f8fafc;">
+        <img src="${p.base64Data}" alt="${p.caption || p.fileName}" style="max-height: 310px; max-width: 95%; object-fit: contain; border-radius: 4px; background: #fff;" />
+        <div style="margin-top: 10px; font-size: 9.5pt; font-style: italic; font-family: Arial, sans-serif; color: #334155;">
           <strong>Foto ${idx + 1}:</strong> ${p.caption || p.fileName}
         </div>
       </div>
@@ -65,8 +78,8 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
 
     photosHtml = `
       <div style="page-break-before: always; break-before: page; padding-top: 16px;">
-        <div style="text-align: center; margin-bottom: 24px;">
-          <div style="font-size: 13pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">LAMPIRAN: DOKUMENTASI FOTO KEGIATAN</div>
+        <div style="text-align: center; margin-bottom: 24px; page-break-after: avoid; break-after: avoid;">
+          <div style="font-size: 12pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">LAMPIRAN: DOKUMENTASI FOTO KEGIATAN</div>
           <div style="width: 120px; border-bottom: 2px solid #000; margin: 8px auto 20px auto;"></div>
         </div>
         <div>
@@ -78,10 +91,11 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
 
   // Build Signature Section
   const signatureImgHtml = data.signatureData
-    ? `<img src="${data.signatureData}" alt="Tanda Tangan" style="max-height: 70px; max-width: 180px; object-fit: contain;" />`
-    : `<div style="height: 50px;"></div>`;
+    ? `<img src="${data.signatureData}" alt="Tanda Tangan" style="max-height: 65px; max-width: 170px; object-fit: contain;" />`
+    : `<div style="height: 48px;"></div>`;
 
   const judulLaporan = formatJudulLaporan(data.rencanaAksi);
+  const signatureDate = extractFormalDateForSignature(data.waktuPelaksanaan, data.tanggalPembuatan);
 
   const fullHtml = `<!DOCTYPE html>
 <html lang="id">
@@ -91,7 +105,7 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
   <style>
     @page {
       size: A4 portrait;
-      margin: 2.5cm 2.5cm 2.5cm 2.5cm;
+      margin: 25mm 20mm 25mm 25mm;
     }
     *, *:before, *:after {
       box-sizing: border-box;
@@ -100,10 +114,10 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
       margin: 0;
       padding: 0;
       background: #fff;
-      color: #111827;
+      color: #000000;
       font-family: 'Times New Roman', Times, Georgia, serif;
       font-size: 11pt;
-      line-height: 1.6;
+      line-height: 1.55;
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
     }
@@ -113,7 +127,7 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
       margin: 0 auto;
     }
     .section-title {
-      font-size: 12pt;
+      font-size: 11.5pt;
       font-weight: bold;
       color: #000;
       text-transform: uppercase;
@@ -123,26 +137,37 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
       break-after: avoid;
     }
     .section-content {
-      padding-left: 18px;
+      padding-left: 16px;
       text-align: justify;
       text-justify: inter-word;
     }
     .sub-item {
       margin-bottom: 10px;
+      page-break-inside: avoid;
+      break-inside: avoid;
     }
     .sub-item-title {
       font-weight: bold;
-      margin-bottom: 2px;
+      margin-top: 6px;
+      margin-bottom: 3px;
       page-break-after: avoid;
       break-after: avoid;
+      color: #000;
+      font-size: 10.5pt;
     }
     .text-paragraph {
-      white-space: pre-line;
-      margin: 0;
-      color: #1f2937;
+      margin: 0 0 8px 0;
+      text-align: justify;
+      text-justify: inter-word;
+      line-height: 1.55;
+      color: #111827;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      orphans: 3;
+      widows: 3;
     }
     .signature-container {
-      margin-top: 28px;
+      margin-top: 24px;
       page-break-inside: avoid;
       break-inside: avoid;
       width: 100%;
@@ -159,6 +184,10 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
         margin: 0;
         padding: 0;
       }
+      .document-wrapper {
+        margin: 0;
+        padding: 0;
+      }
     }
   </style>
 </head>
@@ -167,11 +196,11 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
     ${kopHtml}
 
     <!-- Header Judul Laporan -->
-    <div style="text-align: center; margin-bottom: 24px;">
-      <div style="font-size: 14pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #000;">LAPORAN</div>
-      <div style="font-size: 12pt; font-weight: bold; text-transform: uppercase; margin: 4px 0; color: #000;">TENTANG</div>
-      <div style="font-size: 13pt; font-weight: bold; text-transform: uppercase; color: #000; line-height: 1.3;">${judulLaporan}</div>
-      ${(!data.kopTipe || data.kopTipe === "none") ? '<div style="width: 100%; border-bottom: 2px solid #000; margin-top: 12px; margin-bottom: 20px;"></div>' : ''}
+    <div style="text-align: center; margin-bottom: 20px; page-break-after: avoid; break-after: avoid;">
+      <div style="font-size: 13.5pt; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; color: #000;">LAPORAN</div>
+      <div style="font-size: 11pt; font-weight: bold; text-transform: uppercase; margin: 3px 0; color: #000;">TENTANG</div>
+      <div style="font-size: 12pt; font-weight: bold; text-transform: uppercase; color: #000; line-height: 1.3;">${judulLaporan}</div>
+      ${(!data.kopTipe || data.kopTipe === "none") ? '<div style="width: 100%; border-bottom: 2px solid #000; margin-top: 10px; margin-bottom: 16px;"></div>' : ''}
     </div>
 
     <!-- A. PENDAHULUAN -->
@@ -180,19 +209,19 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
       <div class="section-content">
         <div class="sub-item">
           <div class="sub-item-title">1. Umum</div>
-          <p class="text-paragraph">${data.pendahuluan.umum || "-"}</p>
+          ${formatParagraphsHtml(data.pendahuluan.umum)}
         </div>
         <div class="sub-item">
           <div class="sub-item-title">2. Maksud dan Tujuan</div>
-          <p class="text-paragraph">${data.pendahuluan.maksudDanTujuan || "-"}</p>
+          ${formatParagraphsHtml(data.pendahuluan.maksudDanTujuan)}
         </div>
         <div class="sub-item">
           <div class="sub-item-title">3. Ruang Lingkup</div>
-          <p class="text-paragraph">${data.pendahuluan.ruangLingkup || "-"}</p>
+          ${formatParagraphsHtml(data.pendahuluan.ruangLingkup)}
         </div>
         <div class="sub-item">
           <div class="sub-item-title">4. Dasar</div>
-          <p class="text-paragraph">${data.pendahuluan.dasar || "-"}</p>
+          ${formatParagraphsHtml(data.pendahuluan.dasar, false)}
         </div>
       </div>
     </div>
@@ -201,7 +230,7 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
     <div style="margin-top: 12px;">
       <div class="section-title">B. KEGIATAN YANG DILAKSANAKAN</div>
       <div class="section-content">
-        <p class="text-paragraph">${data.kegiatanLaksana || "-"}</p>
+        ${formatParagraphsHtml(data.kegiatanLaksana)}
       </div>
     </div>
 
@@ -209,7 +238,7 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
     <div style="margin-top: 12px;">
       <div class="section-title">C. HASIL YANG DICAPAI</div>
       <div class="section-content">
-        <p class="text-paragraph">${data.hasilDicapai || "-"}</p>
+        ${formatParagraphsHtml(data.hasilDicapai)}
       </div>
     </div>
 
@@ -219,11 +248,11 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
       <div class="section-content">
         <div class="sub-item">
           <div class="sub-item-title">1. Kesimpulan</div>
-          <p class="text-paragraph">${data.simpulanDanSaran.kesimpulan || "-"}</p>
+          ${formatParagraphsHtml(data.simpulanDanSaran.kesimpulan)}
         </div>
         <div class="sub-item">
           <div class="sub-item-title">2. Saran</div>
-          <p class="text-paragraph">${data.simpulanDanSaran.saran || "-"}</p>
+          ${formatParagraphsHtml(data.simpulanDanSaran.saran)}
         </div>
       </div>
     </div>
@@ -232,7 +261,7 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
     <div style="margin-top: 12px;">
       <div class="section-title">E. PENUTUP</div>
       <div class="section-content">
-        <p class="text-paragraph">${data.penutup || "-"}</p>
+        ${formatParagraphsHtml(data.penutup)}
       </div>
     </div>
 
@@ -240,16 +269,16 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
     <div class="signature-container">
       <table class="signature-table">
         <tr>
-          <td style="width: 52%;"></td>
-          <td style="width: 48%; text-align: left;">
-            <div>${data.tempatPembuatan || "Jakarta"}, ${extractFormalDateForSignature(data.waktuPelaksanaan, data.tanggalPembuatan)}</div>
+          <td style="width: 48%;"></td>
+          <td style="width: 52%; text-align: left;">
+            <div style="font-size: 10.5pt;">${data.tempatPembuatan || "Jakarta"}, ${signatureDate}</div>
             <div style="font-weight: bold; text-transform: uppercase; font-size: 9.5pt; margin-top: 2px; letter-spacing: 0.5px;">${data.jabatan || "Pelapor"}</div>
-            <div style="height: 75px; display: flex; align-items: center; justify-content: flex-start; margin: 4px 0;">
+            <div style="height: 68px; display: flex; align-items: center; justify-content: flex-start; margin: 3px 0;">
               ${signatureImgHtml}
             </div>
-            <div style="width: 200px; border-bottom: 1px solid #475569; margin-bottom: 6px;"></div>
+            <div style="width: 200px; border-bottom: 1.5px solid #000; margin-bottom: 4px;"></div>
             <div style="font-weight: bold; text-decoration: underline; text-transform: uppercase; color: #000;">${data.nama || "-"}</div>
-            <div style="color: #4b5563;">NIP. ${data.nip || "-"}</div>
+            <div style="color: #334155; font-size: 9.5pt;">NIP. ${data.nip || "-"}</div>
           </td>
         </tr>
       </table>
@@ -285,7 +314,6 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
 
   const frameDoc = printFrame.contentDocument || printFrame.contentWindow?.document;
   if (!frameDoc) {
-    // Fallback: direct window.print()
     window.print();
     setTimeout(() => {
       document.title = origTitle;
@@ -297,12 +325,10 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
   frameDoc.write(fullHtml);
   frameDoc.close();
 
-  // Ensure title is also set on the frame document
   try {
     frameDoc.title = fileName;
   } catch {}
 
-  // Wait for images and layout inside iframe to be fully ready before printing
   setTimeout(() => {
     try {
       const frameWin = printFrame.contentWindow;
@@ -316,7 +342,6 @@ export function printReportDocument(data: ReportData, photos: PhotoAttachment[] 
       console.warn("Iframe print error, falling back to window.print():", e);
       window.print();
     } finally {
-      // Restore title after dialog closes
       setTimeout(() => {
         document.title = origTitle;
       }, 3000);

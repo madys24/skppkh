@@ -123,7 +123,10 @@ RINCIAN PENYUSUNAN SETIAP BAGIAN DALAM BENTUK PARAGRAF NARASI:
   * 1. Umum: 2-3 paragraf narasi mengalir yang memaparkan latar belakang pelaksanaan tugas lapangan ini, pentingnya kegiatan bagi masyarakat di lokasi kerja, serta peran aktif petugas dalam memastikan program berjalan lancar.
   * 2. Maksud dan Tujuan: 2 paragraf narasi mengalir (tanpa poin 1/2 atau a/b) yang menguraikan maksud kehadiran petugas di lapangan serta target praktis yang ingin dicapai demi keteraturan pelayanan dan kepuasan warga.
   * 3. Ruang Lingkup: 2 paragraf narasi mengalir yang merinci cakupan wilayah di "${tempatPelaksanaan}", sasaran warga/pihak yang ditemui ("${pihakTerlibat}"), serta batas waktu pelaksanaan kegiatan tanpa penomoran baris.
-  * 4. Dasar: 1-2 paragraf narasi mengalir yang menyebutkan surat tugas penugasan, regulasi atau petunjuk teknis terkait, serta target sasaran kinerja pegawai sebagai landasan resmi pelaksanaan tugas.
+  * 4. Dasar: WAJIB berisi format poin rujukan hukum berikut secara persis:
+a. Undang-Undang Nomor 11 Tahun 2009 tentang Kesejahteraan Sosial.
+b. Peraturan Menteri Sosial Republik Indonesia Nomor 8 Tahun 2026 tentang Program Keluarga Harapan.
+c. Keputusan Direktur Jenderal Perlindungan dan Jaminan Sosial Nomor 20/3/HK.01/3/2025.${hasSuratTugas ? `\nd. Surat Tugas ${suratTugasPemberi || "Pimpinan"} Nomor ${suratTugasNomor || "-"} tanggal ${suratTugasTanggal || "-"} perihal ${suratTugasPerihal || "-"}.` : ""}
 - B. KEGIATAN YANG DILAKSANAKAN:
   * 4-5 paragraf narasi kronologis yang menceritakan perjalanan dan aktivitas petugas dari awal persiapan perlengkapan, kehadiran di lokasi "${tempatPelaksanaan}", interaksi ramah dan dialog bersama "${pihakTerlibat}", penanganan teknis/proses kerja lapangan, hingga verifikasi akhir dan dokumentasi bukti kegiatan.
 - C. HASIL YANG DICAPAI:
@@ -145,7 +148,7 @@ Keluarkan HANYA objek JSON sesuai skema berikut tanpa tanda markdown lain:
     "umum": "Paragraf-paragraf narasi mengalir tentang latar belakang tugas lapangan tanpa poin-poin.",
     "maksudDanTujuan": "Paragraf narasi mengalir tentang maksud dan tujuan kegiatan lapangan tanpa penomoran.",
     "ruangLingkup": "Paragraf narasi mengalir tentang batasan wilayah, sasaran, dan waktu tanpa butir daftar.",
-    "dasar": "Paragraf narasi mengalir yang memuat dasar penugasan kedinasan secara deskriptif."
+    "dasar": "a. Undang-Undang Nomor 11 Tahun 2009 tentang Kesejahteraan Sosial.\\nb. Peraturan Menteri Sosial Republik Indonesia Nomor 8 Tahun 2026 tentang Program Keluarga Harapan.\\nc. Keputusan Direktur Jenderal Perlindungan dan Jaminan Sosial Nomor 20/3/HK.01/3/2025."
   },
   "kegiatanLaksana": "Paragraf-paragraf narasi kronologis mendalam yang menceritakan detail proses kegiatan petugas di lapangan tanpa poin/bullet.",
   "hasilDicapai": "Paragraf-paragraf narasi capaian nyata, respons warga, dan ketercapaian target di lapangan tanpa format list.",
